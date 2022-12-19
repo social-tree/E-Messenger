@@ -1,12 +1,25 @@
+import { CacheProvider, EmotionCache } from "@emotion/react";
 import React, { useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { fetchUserRoles, supabase } from "@/lib/Store";
 
 import { AppProps } from "next/app";
+import { CssBaseline } from "@mui/material";
 import UserContext from "@/lib/UserContext";
+import createEmotionCache from "@/lib/createEmotionCache";
 import { useRouter } from "next/router";
 
-const App: React.FC<AppProps> = ({ Component, pageProps }) => {
+const clientSideEmotionCache = createEmotionCache();
+
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache;
+}
+
+const App: React.FC<MyAppProps> = ({
+  Component,
+  pageProps,
+  emotionCache = clientSideEmotionCache,
+}) => {
   const [userLoaded, setUserLoaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -65,17 +78,21 @@ const App: React.FC<AppProps> = ({ Component, pageProps }) => {
   };
 
   return (
-    <UserContext.Provider
-      value={{
-        userLoaded,
-        user,
-        userRoles,
-        signIn,
-        signOut,
-      }}
-    >
-      <Component {...pageProps} />
-    </UserContext.Provider>
+    <CacheProvider value={emotionCache}>
+      <UserContext.Provider
+        value={{
+          userLoaded,
+          user,
+          userRoles,
+          signIn,
+          signOut,
+        }}
+      >
+        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <CssBaseline />
+        <Component {...pageProps} />
+      </UserContext.Provider>
+    </CacheProvider>
   );
 };
 
