@@ -1,5 +1,5 @@
 import { MessageType } from "@/types/messeges";
-import TrashIcon from "@/components/TrashIcon";
+import TrashIcon from "@/icons/TrashIcon";
 import UserContext from "@/lib/UserContext";
 import { deleteMessage } from "@/lib/Store";
 import { useContext } from "react";

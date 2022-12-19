@@ -9,7 +9,8 @@ import {
 import { addChannel, deleteChannel } from "@/lib/Store";
 
 import Link from "next/link";
-import TrashIcon from "@/components/TrashIcon";
+import Navbar from "@/components/Navbar";
+import TrashIcon from "@/icons/TrashIcon";
 import { User } from "@supabase/supabase-js";
 import UserContext from "@/lib/UserContext";
 import { UserType } from "@/types/users";
@@ -44,6 +45,7 @@ export default function Layout({ channels, activeChannelId, children }: Props) {
 
   return (
     <main className="main flex h-screen w-screen overflow-hidden">
+      <Navbar />
       {/* Sidebar */}
       <nav
         className="w-64 bg-gray-900 text-gray-100 overflow-scroll "
