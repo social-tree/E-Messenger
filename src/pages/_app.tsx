@@ -6,6 +6,8 @@ import { fetchUserRoles, supabase } from "@/lib/Store";
 import { AppProps } from "next/app";
 import { CssBaseline } from "@mui/material";
 import Layout from "@/Layout";
+import { Global } from "@emotion/react";
+import { GlobalStyle } from "@/global/GlobalStyle";
 import UserContext from "@/lib/UserContext";
 import createEmotionCache from "@/lib/createEmotionCache";
 import { useRouter } from "next/router";
@@ -93,6 +95,7 @@ const App: React.FC<MyAppProps> = ({
         <CssBaseline />
         <Layout>
           <Component {...pageProps} />
+          <Global styles={GlobalStyle} />
         </Layout>
       </UserContext.Provider>
     </CacheProvider>
