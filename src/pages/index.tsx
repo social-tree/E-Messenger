@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import { supabase } from "@/lib/Store";
 import { useState } from "react";
 
@@ -5,7 +6,11 @@ const Home = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (type, username, password) => {
+  const handleLogin = async (
+    type: string,
+    username: string,
+    password: string
+  ) => {
     try {
       const {
         error,
@@ -24,14 +29,14 @@ const Home = () => {
         alert("Error with auth: " + error.message);
       } else if (!user)
         alert("Signup successful, confirmation mail should be sent soon!");
-    } catch (error) {
+    } catch (error: any) {
       console.log("error", error);
       alert(error.error_description || error);
     }
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center p-4 bg-gray-300">
+    <Container className="w-full h-full flex justify-center items-center p-4 bg-gray-300">
       <div className="w-full sm:w-1/2 xl:w-1/3">
         <div className="border-teal p-8 border-t-12 bg-white mb-6 rounded-lg shadow-lg bg-white">
           <div className="mb-4">
@@ -83,8 +88,12 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  box-sizing: border-box;
+`;
 
 export default Home;

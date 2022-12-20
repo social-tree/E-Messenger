@@ -5,6 +5,7 @@ import { fetchUserRoles, supabase } from "@/lib/Store";
 
 import { AppProps } from "next/app";
 import { CssBaseline } from "@mui/material";
+import Layout from "@/Layout";
 import UserContext from "@/lib/UserContext";
 import createEmotionCache from "@/lib/createEmotionCache";
 import { useRouter } from "next/router";
@@ -90,7 +91,9 @@ const App: React.FC<MyAppProps> = ({
       >
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </UserContext.Provider>
     </CacheProvider>
   );

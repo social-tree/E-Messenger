@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import Document, { Head, Html, Main, NextScript } from "next/document";
+import { Global, css } from "@emotion/react";
 
 import createEmotionCache from "@/lib/createEmotionCache";
 import createEmotionServer from "@emotion/server/create-instance";
@@ -16,6 +17,13 @@ export default class MyDocument extends Document {
           <meta name="emotion-insertion-point" content="" />
           {(this.props as any).emotionStyleTags}
         </Head>
+        <Global
+          styles={css`
+            body {
+              padding-right: 0px !important;
+            }
+          `}
+        />
         <body>
           <Main />
           <NextScript />
