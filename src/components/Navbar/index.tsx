@@ -2,7 +2,6 @@ import {
   Container,
   Lastseen,
   LogoIcon,
-  MenuIcon,
   ProfileImage,
   ProfileInfo,
   SettingsIcon,
