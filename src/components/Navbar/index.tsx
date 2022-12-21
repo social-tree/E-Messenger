@@ -1,22 +1,60 @@
-import { Container, ProfileInfo } from "./Navbar.styles";
+import {
+  Container,
+  Lastseen,
+  LogoIcon,
+  MenuIcon,
+  ProfileImage,
+  ProfileInfo,
+  SettingsIcon,
+  UserInfo,
+  Username,
+} from "./Navbar.styles";
+import { useContext, useState } from "react";
 
-import Image from "next/image";
-import Logo from "@/icons/Logo.svg";
-import Menu from "@/icons/MenuDots.svg";
-import Settings from "@/icons/Settings.svg";
+import { Button } from "../Button";
+import SettingsModal from "../SettingsModal";
+import UserContext from "@/lib/UserContext";
 
-const Navbar = () => {
+interface Props {
+  username?: string;
+  time?: string;
+}
+
+const Navbar = ({ username, time }: Props) => {
+  const [openSettings, setOpenSettings] = useState<Element | null>(null);
+  const { user, signIn } = useContext(UserContext);
+
+  const closeSettings = () => {
+    setOpenSettings(null);
+  };
+
+  const handleOpenSettings = (event: React.MouseEvent<Element>) => {
+    setOpenSettings(event.currentTarget);
+  };
+
   return (
-    <Container>
-      <Logo width={159} height={56} />
+    <Container openSettings={!!openSettings}>
+      <LogoIcon />
+      <UserInfo>
+        {username && <Username>{username}</Username>}
+        {username && time ? (
+          <Lastseen>last seen {time} ago</Lastseen>
+        ) : (
+          username && <Lastseen>online</Lastseen>
+        )}
+      </UserInfo>
       <ProfileInfo>
-        <Settings width={24} height={24} />
-        <Menu />
-        <Image
-          src="https://i.pinimg.com/originals/c0/c2/16/c0c216b3743c6cb9fd67ab7df6b2c330.jpg"
-          width={32}
-          height={32}
-        />
+        {user && (
+          <>
+            <SettingsIcon onClick={(e: any) => handleOpenSettings(e)} />
+            <SettingsModal open={openSettings} onClose={closeSettings} />
+            <ProfileImage
+              src="https://i.pinimg.com/originals/c0/c2/16/c0c216b3743c6cb9fd67ab7df6b2c330.jpg"
+              width={52}
+              height={52}
+            />
+          </>
+        )}
       </ProfileInfo>
     </Container>
   );
