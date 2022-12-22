@@ -1,21 +1,21 @@
-import { MessageType } from "@/types/messeges";
-import TrashIcon from "@/icons/TrashIcon";
-import UserContext from "@/lib/UserContext";
-import { deleteMessage } from "@/lib/Store";
-import { useContext } from "react";
+import { MessageType } from '@/types/messeges'
+import TrashIcon from '@/assets/icons/TrashIcon'
+import UserContext from '@/lib/UserContext'
+import { deleteMessage } from '@/lib/Store'
+import { useContext } from 'react'
 
 interface Props {
-  message: MessageType;
+  message: MessageType
 }
 
 const Message = ({ message }: Props) => {
-  const { user, userRoles } = useContext(UserContext);
+  const { user, userRoles } = useContext(UserContext)
 
   return (
     <div className="py-1 flex items-center space-x-2">
       <div className="text-gray-100 w-4">
         {(user?.id === message.user_id ||
-          userRoles?.some((role) => ["admin", "moderator"].includes(role))) && (
+          userRoles?.some((role) => ['admin', 'moderator'].includes(role))) && (
           <button onClick={() => deleteMessage(`${message.id}`)}>
             <TrashIcon />
           </button>
@@ -26,7 +26,7 @@ const Message = ({ message }: Props) => {
         <p className="text-white">{message.message}</p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Message;
+export default Message

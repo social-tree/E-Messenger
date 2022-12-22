@@ -1,19 +1,25 @@
-import { CacheProvider, EmotionCache } from "@emotion/react";
-import React, { useEffect, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import { fetchUserRoles, supabase } from "@/lib/Store";
+import { CacheProvider, EmotionCache, ThemeProvider } from '@emotion/react'
+import React, { useEffect, useState } from 'react'
+import { Session, User } from '@supabase/supabase-js'
+import { ThemeType, theme } from '@/global/theme'
 
-import { AppProps } from "next/app";
-import { CssBaseline } from "@mui/material";
-import Layout from "@/Layout";
-import UserContext from "@/lib/UserContext";
-import createEmotionCache from "@/lib/createEmotionCache";
-import { useRouter } from "next/router";
+import { AppProps } from 'next/app'
+import { CssBaseline } from '@mui/material'
+import { Global } from '@emotion/react'
+import { GlobalStyle } from '@/global/GlobalStyle'
+import Layout from '@/Layout'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import UserContext from '@/lib/UserContext'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import createEmotionCache from '@/lib/createEmotionCache'
+import { fetchUserRoles } from '@/lib/Store'
+import { useRouter } from 'next/router'
+import { useUser } from '@supabase/auth-helpers-react'
 
-const clientSideEmotionCache = createEmotionCache();
+const clientSideEmotionCache = createEmotionCache()
 
 interface MyAppProps extends AppProps {
-  emotionCache?: EmotionCache;
+  emotionCache?: EmotionCache
 }
 
 const App: React.FC<MyAppProps> = ({
@@ -21,82 +27,59 @@ const App: React.FC<MyAppProps> = ({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }) => {
-  const [userLoaded, setUserLoaded] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [userRoles, setUserRoles] = useState<Array<string>>([]);
-  const router = useRouter();
+  const [userLoaded, setUserLoaded] = useState(false)
+  const [userRoles, setUserRoles] = useState<Array<string>>([])
+  const router = useRouter()
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient())
+  const user = useUser()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUserLoaded(session ? true : false);
-      if (session?.user) {
-        signIn();
-        router.push("/channels/[id]", "/channels/1");
-      }
-    });
-
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user ?? null);
-      setUserLoaded(!!user);
-    };
-
-    const {
-      data: { subscription: authListener },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      const currentUser = session?.user;
-      setUser(currentUser ?? null);
-      setUserLoaded(!!currentUser);
-      if (currentUser) {
-        router.push("/channels/[id]", "/channels/1");
-      } else {
-        router.push("/");
-      }
-    });
-
-    if (!user && !userLoaded) getUser();
-    return () => {
-      authListener.unsubscribe();
-    };
-  }, []);
+    if (user && router.pathname === '/') {
+      router.push('/channels/[id]', '/channels/1')
+    } else if (!user) {
+      router.push('/')
+    }
+  }, [user])
 
   const signIn = async () => {
     return await fetchUserRoles((userRoles: { role: string }[]) =>
       setUserRoles(userRoles.map((userRole) => userRole.role))
-    );
-  };
+    )
+  }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut()
     if (!error) {
-      router.push("/");
+      router.push('/')
     }
-  };
+  }
 
   return (
     <CacheProvider value={emotionCache}>
-      <UserContext.Provider
-        value={{
-          userLoaded,
-          user,
-          userRoles,
-          signIn,
-          signOut,
-        }}
+      {' '}
+      <SessionContextProvider
+        supabaseClient={supabaseClient}
+        initialSession={pageProps.initialSession}
       >
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </UserContext.Provider>
+        <UserContext.Provider
+          value={{
+            userLoaded,
+            user,
+            userRoles,
+            signIn,
+            signOut,
+          }}
+        >
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <ThemeProvider theme={theme.light}>
+            <Component {...pageProps} />
+          </ThemeProvider>
+          <Global styles={GlobalStyle} />
+        </UserContext.Provider>
+      </SessionContextProvider>
     </CacheProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App

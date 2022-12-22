@@ -1,140 +1,135 @@
-import { ChannelType, ChannelsType } from "@/types/channels";
-import { MessageType, MessagesType } from "@/types/messeges";
-import { SetStateAction, useEffect, useState } from "react";
-import { User, createClient } from "@supabase/supabase-js";
+import { ChannelType, ChannelsType } from '@/types/channels'
+import { MessageType, MessagesType } from '@/types/messeges'
+import { SetStateAction, useEffect, useState } from 'react'
+import { User, createClient } from '@supabase/supabase-js'
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.NEXT_PUBLIC_SUPABASE_KEY as string
-);
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+
+const supabaseClient = createBrowserSupabaseClient()
 
 /**
  * @param {number} channelId the currently selected Channel
  */
 export const useStore = (props: { channelId: any }) => {
-  const [channels, setChannels] = useState<ChannelsType>([]);
-  const [messages, setMessages] = useState<MessagesType>([]);
-  const [users] = useState(new Map());
-  const [newMessage, handleNewMessage] = useState<MessageType | null>(null);
-  const [newChannel, handleNewChannel] = useState(null);
-  const [newOrUpdatedUser, handleNewOrUpdatedUser] = useState<User | null>(
-    null
-  );
+  const [channels, setChannels] = useState<ChannelsType>([])
+  const [messages, setMessages] = useState<MessagesType>([])
+  const [users] = useState(new Map())
+  const [newMessage, handleNewMessage] = useState<MessageType | null>(null)
+  const [newChannel, handleNewChannel] = useState(null)
+  const [newOrUpdatedUser, handleNewOrUpdatedUser] = useState<User | null>(null)
   const [deletedChannel, handleDeletedChannel] = useState<ChannelType | null>(
     null
-  );
+  )
   const [deletedMessage, handleDeletedMessage] = useState<MessageType | null>(
     null
-  );
+  )
 
   // Load initial data and set up listeners
   useEffect(() => {
     // Get Channels
-    fetchChannels(setChannels);
+    fetchChannels(setChannels)
     // Listen for new and deleted messages
-    const messageListener = supabase
-      .channel("public:messages")
+    const messageListener = supabaseClient
+      .channel('public:messages')
       .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages" },
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload) => /* handleNewMessage(payload.new) */ console.log(payload)
       )
       .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "messages" },
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'messages' },
         (payload) =>
           /* handleDeletedMessage(payload.old) */ console.log(payload)
       )
-      .subscribe();
+      .subscribe()
     // Listen for changes to our users
-    const userListener = supabase
-      .channel("public:users")
+    const userListener = supabaseClient
+      .channel('public:users')
       .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "users" },
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'users' },
         (payload) =>
           /* handleNewOrUpdatedUser(payload.new) */ console.log(payload)
       )
-      .subscribe();
+      .subscribe()
     // Listen for new and deleted channels
-    const channelListener = supabase
-      .channel("public:channels")
+    const channelListener = supabaseClient
+      .channel('public:channels')
       .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "channels" },
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'channels' },
         (payload) => /* handleNewChannel(payload.new) */ console.log(payload)
       )
       .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "channels" },
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'channels' },
         (payload) =>
           /* handleDeletedChannel(payload.old) */ console.log(payload)
       )
-      .subscribe();
+      .subscribe()
     // Cleanup on unmount
     return () => {
-      supabase.removeChannel(messageListener);
-      supabase.removeChannel(userListener);
-      supabase.removeChannel(channelListener);
-    };
-  }, []);
+      supabaseClient.removeChannel(messageListener)
+      supabaseClient.removeChannel(userListener)
+      supabaseClient.removeChannel(channelListener)
+    }
+  }, [])
 
   // Update when the route changes
   useEffect(() => {
     if (props?.channelId > 0) {
       fetchMessages(props.channelId, (messages: any[]) => {
-        messages.forEach((x) => users.set(x.user_id, x.author));
-        setMessages(messages);
-      });
+        messages.forEach((x) => users.set(x.user_id, x.author))
+        setMessages(messages)
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.channelId]);
+  }, [props.channelId])
 
   // New message received from Postgres
   useEffect(() => {
     if (newMessage && newMessage.channel_id === Number(props.channelId)) {
       const handleAsync = async () => {
-        let authorId = newMessage.user_id;
+        let authorId = newMessage.user_id
         if (!users.get(authorId))
-          await fetchUser(authorId, (user: any) =>
-            handleNewOrUpdatedUser(user)
-          );
-        setMessages(messages.concat(newMessage));
-      };
-      handleAsync();
+          await fetchUser(authorId, (user: any) => handleNewOrUpdatedUser(user))
+        setMessages(messages.concat(newMessage))
+      }
+      handleAsync()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newMessage]);
+  }, [newMessage])
 
   // Deleted message received from postgres
   useEffect(() => {
     if (deletedMessage)
       setMessages(
         messages.filter((message) => message.id !== deletedMessage.id)
-      );
+      )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deletedMessage]);
+  }, [deletedMessage])
 
   // New channel received from Postgres
   useEffect(() => {
-    if (newChannel) setChannels(channels.concat(newChannel));
+    if (newChannel) setChannels(channels.concat(newChannel))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newChannel]);
+  }, [newChannel])
 
   // Deleted channel received from postgres
   useEffect(() => {
     if (deletedChannel)
       setChannels(
         channels.filter((channel) => channel.id !== deletedChannel.id)
-      );
+      )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deletedChannel]);
+  }, [deletedChannel])
 
   // New or updated user received from Postgres
   useEffect(() => {
-    if (newOrUpdatedUser) users.set(newOrUpdatedUser.id, newOrUpdatedUser);
+    if (newOrUpdatedUser) users.set(newOrUpdatedUser.id, newOrUpdatedUser)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newOrUpdatedUser]);
+  }, [newOrUpdatedUser])
 
   return {
     // We can export computed values here to map the authors to each message
@@ -144,8 +139,8 @@ export const useStore = (props: { channelId: any }) => {
         ? channels.sort((a, b) => a.slug.localeCompare(b.slug))
         : [],
     users,
-  };
-};
+  }
+}
 
 /**
  * Fetch all channels
@@ -153,13 +148,13 @@ export const useStore = (props: { channelId: any }) => {
  */
 export const fetchChannels = async (setState: Function) => {
   try {
-    let { data } = await supabase.from("channels").select("*");
-    if (setState) setState(data);
-    return data;
+    let { data } = await supabaseClient.from('channels').select('*')
+    if (setState) setState(data)
+    return data
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 /**
  * Fetch a single user
@@ -168,16 +163,19 @@ export const fetchChannels = async (setState: Function) => {
  */
 export const fetchUser = async (userId: string, setState: Function) => {
   try {
-    let { data } = await supabase.from("users").select(`*`).eq("id", userId);
+    let { data } = await supabaseClient
+      .from('users')
+      .select(`*`)
+      .eq('id', userId)
     if (data) {
-      let user = data[0];
-      if (setState) setState(user);
-      return user;
+      let user = data[0]
+      if (setState) setState(user)
+      return user
     }
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 /**
  * Fetch all roles for the current user
@@ -185,13 +183,13 @@ export const fetchUser = async (userId: string, setState: Function) => {
  */
 export const fetchUserRoles = async (setState: Function) => {
   try {
-    let { data } = await supabase.from("user_roles").select(`*`);
-    if (setState) setState(data);
-    return data;
+    let { data } = await supabaseClient.from('user_roles').select(`*`)
+    if (setState) setState(data)
+    return data
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 /**
  * Fetch all messages and their authors
@@ -200,17 +198,17 @@ export const fetchUserRoles = async (setState: Function) => {
  */
 export const fetchMessages = async (channelId: string, setState: Function) => {
   try {
-    let { data } = await supabase
-      .from("messages")
+    let { data } = await supabaseClient
+      .from('messages')
       .select(`*, author:user_id(*)`)
-      .eq("channel_id", channelId)
-      .order("inserted_at", { ascending: true });
-    if (setState) setState(data);
-    return data;
+      .eq('channel_id', channelId)
+      .order('inserted_at', { ascending: true })
+    if (setState) setState(data)
+    return data
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 /**
  * Insert a new channel into the DB
@@ -219,15 +217,15 @@ export const fetchMessages = async (channelId: string, setState: Function) => {
  */
 export const addChannel = async (slug: string, user_id: string) => {
   try {
-    let { data } = await supabase
-      .from("channels")
+    let { data } = await supabaseClient
+      .from('channels')
       .insert([{ slug, created_by: user_id }])
-      .select();
-    return data;
+      .select()
+    return data
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 /**
  * Insert a new message into the DB
@@ -241,15 +239,15 @@ export const addMessage = async (
   user_id: string
 ) => {
   try {
-    let { data } = await supabase
-      .from("messages")
+    let { data } = await supabaseClient
+      .from('messages')
       .insert([{ message, channel_id, user_id }])
-      .select();
-    return data;
+      .select()
+    return data
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 /**
  * Delete a channel from the DB
@@ -257,15 +255,15 @@ export const addMessage = async (
  */
 export const deleteChannel = async (channel_id: string) => {
   try {
-    let { data } = await supabase
-      .from("channels")
+    let { data } = await supabaseClient
+      .from('channels')
       .delete()
-      .match({ id: channel_id });
-    return data;
+      .match({ id: channel_id })
+    return data
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}
 
 /**
  * Delete a message from the DB
@@ -273,12 +271,12 @@ export const deleteChannel = async (channel_id: string) => {
  */
 export const deleteMessage = async (message_id: string) => {
   try {
-    let { data } = await supabase
-      .from("messages")
+    let { data } = await supabaseClient
+      .from('messages')
       .delete()
-      .match({ id: message_id });
-    return data;
+      .match({ id: message_id })
+    return data
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error)
   }
-};
+}

@@ -1,4 +1,6 @@
-import { Modal } from "@mui/material";
+import { Modal, Popover } from "@mui/material";
+
+import { ThemeType } from "@/global/theme";
 import styled from "@emotion/styled";
 
 export const Name = styled.p``;
@@ -6,13 +8,8 @@ export const Name = styled.p``;
 export const Row = styled.div``;
 
 export const Container = styled.div`
-  background-color: white;
+  background-color: ${({ theme }) => theme.bg};
   max-width: 300px;
 `;
 
-export const StyledModal = styled(Modal)`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-right: 30px;
-`;
+export const StyledPopover = styled(Popover)``;

@@ -1,6 +1,7 @@
-import { Popover, Typography } from "@mui/material";
+import { Container, StyledPopover } from "./SettingsModal.styles";
 
 import React from "react";
+import { Typography } from "@mui/material";
 
 interface Props {
   open: Element | null;
@@ -9,7 +10,7 @@ interface Props {
 
 const SettingsModal = ({ open, onClose }: Props) => {
   return (
-    <Popover
+    <StyledPopover
       open={!!open}
       anchorEl={open}
       onClose={onClose}
@@ -18,8 +19,10 @@ const SettingsModal = ({ open, onClose }: Props) => {
         horizontal: "left",
       }}
     >
-      <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
-    </Popover>
+      <Container>
+        <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
+      </Container>
+    </StyledPopover>
   );
 };
 
