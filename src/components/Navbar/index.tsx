@@ -2,7 +2,6 @@ import {
   Container,
   Lastseen,
   LogoIcon,
-  MenuIcon,
   ProfileImage,
   ProfileInfo,
   SettingsIcon,
@@ -11,7 +10,7 @@ import {
 } from "./Navbar.styles";
 import { useContext, useState } from "react";
 
-import { Button } from "../Button";
+import Link from "next/link";
 import SettingsModal from "../SettingsModal";
 import UserContext from "@/lib/UserContext";
 
@@ -34,7 +33,9 @@ const Navbar = ({ username, time }: Props) => {
 
   return (
     <Container openSettings={!!openSettings}>
-      <LogoIcon />
+      <Link href={"/"}>
+        <LogoIcon />
+      </Link>
       <UserInfo>
         {username && <Username>{username}</Username>}
         {username && time ? (
