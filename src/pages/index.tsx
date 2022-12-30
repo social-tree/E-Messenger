@@ -217,7 +217,7 @@ const StyledLottie = styled(Lottie)`
 
 const SocialButton = styled(Button)`
   background-color: white;
-  border: 2px solid ${({ theme }) => `${theme.grey}60`};
+  box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
   width: 100%;
   height: 45px;
@@ -225,7 +225,8 @@ const SocialButton = styled(Button)`
   &:hover {
     background-color: transparent;
     border: none;
-    box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.15);
+    box-shadow: none;
+    border: 2px solid ${({ theme }) => `${theme.grey}60`};
   }
 `
 
