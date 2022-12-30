@@ -14,7 +14,6 @@ import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import createEmotionCache from '@/lib/createEmotionCache'
 import { fetchUserRoles } from '@/lib/Store'
 import { useRouter } from 'next/router'
-import { useUser } from '@/hooks/useUser'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -66,7 +65,6 @@ const App: React.FC<MyAppProps> = ({
             signOut,
           }}
         >
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <ThemeProvider theme={theme.light}>
             <Component {...pageProps} />

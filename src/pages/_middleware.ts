@@ -20,7 +20,6 @@ export async function middleware(req: NextRequest) {
     redirectUrl.pathname = '/channels/1'
     return NextResponse.redirect(redirectUrl)
   }
-  console.log(req?.page.name)
   return
 }
 
