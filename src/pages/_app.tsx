@@ -14,7 +14,7 @@ import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import createEmotionCache from '@/lib/createEmotionCache'
 import { fetchUserRoles } from '@/lib/Store'
 import { useRouter } from 'next/router'
-import { useUser } from '@supabase/auth-helpers-react'
+import { useUser } from '@/hooks/useUser'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -29,17 +29,9 @@ const App: React.FC<MyAppProps> = ({
 }) => {
   const [userLoaded, setUserLoaded] = useState(false)
   const [userRoles, setUserRoles] = useState<Array<string>>([])
+  const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
-  const user = useUser()
-
-  useEffect(() => {
-    if (user && router.pathname === '/') {
-      router.push('/channels/[id]', '/channels/1')
-    } else if (!user) {
-      router.push('/')
-    }
-  }, [user])
 
   const signIn = async () => {
     return await fetchUserRoles((userRoles: { role: string }[]) =>
@@ -53,6 +45,10 @@ const App: React.FC<MyAppProps> = ({
       router.push('/')
     }
   }
+
+  useEffect(() => {
+    supabaseClient.auth.getUser().then((res) => setUser(res.data.user))
+  }, [])
 
   return (
     <CacheProvider value={emotionCache}>

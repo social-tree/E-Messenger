@@ -11,6 +11,7 @@ import Lottie from 'lottie-react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import styled from '@emotion/styled'
 import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 const Home = () => {
@@ -22,6 +23,7 @@ const Home = () => {
     handleSubmit,
   } = useForm()
   const [showForgetPassword, setShowForgetPassword] = useState(false)
+  const router = useRouter()
 
   const handleClose = () => {
     setShowForgetPassword(false)
@@ -36,10 +38,15 @@ const Home = () => {
         data: { user },
       } =
         authMode === 'login'
-          ? await supabaseClient.auth.signInWithPassword({
-              email,
-              password,
-            })
+          ? await supabaseClient.auth
+              .signInWithPassword({
+                email,
+                password,
+              })
+              .then((res) => {
+                router.push('/channels/1')
+                return res
+              })
           : password === confirmPassword
           ? await supabaseClient.auth.signUp({ email, password })
           : {
@@ -188,7 +195,7 @@ const SignUp = styled.span`
 const ImageWrap = styled.div`
   width: 100%;
   height: 100vh;
-  background: ${({ theme }) => theme.blue};
+  background: #4f81a3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -258,7 +265,6 @@ const Wrap = styled.form`
   padding: 1.5em 5em;
   border-radius: 15px;
   min-width: 363px;
-
   @media only screen and (max-width: 900px) {
     max-width: 350px;
     padding: 1.5em 2em;

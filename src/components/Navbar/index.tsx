@@ -7,33 +7,33 @@ import {
   SettingsIcon,
   UserInfo,
   Username,
-} from "./Navbar.styles";
-import { useContext, useState } from "react";
+} from './Navbar.styles'
+import { useContext, useState } from 'react'
 
-import Link from "next/link";
-import SettingsModal from "../SettingsModal";
-import UserContext from "@/lib/UserContext";
+import Link from 'next/link'
+import SettingsModal from '../SettingsModal'
+import UserContext from '@/lib/UserContext'
 
 interface Props {
-  username?: string;
-  time?: string;
+  username?: string
+  time?: string
 }
 
 const Navbar = ({ username, time }: Props) => {
-  const [openSettings, setOpenSettings] = useState<Element | null>(null);
-  const { user, signIn } = useContext(UserContext);
-
+  const [openSettings, setOpenSettings] = useState<Element | null>(null)
+  const { user, signIn, signOut } = useContext(UserContext)
+  console.log(user)
   const closeSettings = () => {
-    setOpenSettings(null);
-  };
+    setOpenSettings(null)
+  }
 
   const handleOpenSettings = (event: React.MouseEvent<Element>) => {
-    setOpenSettings(event.currentTarget);
-  };
+    setOpenSettings(event.currentTarget)
+  }
 
   return (
     <Container openSettings={!!openSettings}>
-      <Link href={"/"}>
+      <Link href={'/'}>
         <LogoIcon />
       </Link>
       <UserInfo>
@@ -50,6 +50,7 @@ const Navbar = ({ username, time }: Props) => {
             <SettingsIcon onClick={(e: any) => handleOpenSettings(e)} />
             <SettingsModal open={openSettings} onClose={closeSettings} />
             <ProfileImage
+              onClick={() => signOut()}
               src="https://i.pinimg.com/originals/c0/c2/16/c0c216b3743c6cb9fd67ab7df6b2c330.jpg"
               width={52}
               height={52}
@@ -58,7 +59,7 @@ const Navbar = ({ username, time }: Props) => {
         )}
       </ProfileInfo>
     </Container>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

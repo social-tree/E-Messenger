@@ -23,9 +23,6 @@ const ForgotPassword = () => {
     formState: { errors },
     handleSubmit,
   } = useForm()
-
-  const user = useUser()
-  const router = useRouter()
   const supabaseClient = createBrowserSupabaseClient()
 
   const handleAuth = async (data: any) => {
