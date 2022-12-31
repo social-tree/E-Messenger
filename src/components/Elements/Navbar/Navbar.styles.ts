@@ -40,8 +40,11 @@ export const LogoIcon = styled(Logo)`
   }
 `
 
-export const ProfileImage = styled(Image)`
+export const ProfileImage = styled.div`
+  min-height: 24px !important;
+  min-width: 24px !important;
   border-radius: 50%;
+  overflow: hidden;
   &:hover {
     cursor: pointer;
   }

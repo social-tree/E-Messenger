@@ -1,7 +1,7 @@
 import { MessageType } from '@/types/messeges'
 import TrashIcon from '@/assets/icons/TrashIcon'
-import UserContext from '@/lib/UserContext'
-import { deleteMessage } from '@/lib/Store'
+import UserContext from '@/context/UserContext'
+import { deleteMessage } from '@/hooks/useStore'
 import { useContext } from 'react'
 
 interface Props {

@@ -1,72 +1,59 @@
 import { Modal, Typography } from '@mui/material'
+import { useContext, useState } from 'react'
 
-import Button from '@/components/Button'
+import Button from '@/components/Elements/Button'
 import ChatAnimation from '@/assets/animations/chat.json'
-import ForgotPassModal from '@/components/ForgotPassModal'
+import ForgotPassModal from '@/components/SingleUseComponents/ForgotPassModal'
 import Google from '@/assets/icons/Google.svg'
 import Image from 'next/image'
-import { Input } from '@/components/Input'
-import Layout from '@/Layout'
+import { Input } from '@/components/Elements/Input'
+import Layout from '@/Layouts/UserLayout'
 import Lottie from 'lottie-react'
+import { UserContext } from '@/context/UserContext'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import styled from '@emotion/styled'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 
 const Home = () => {
   const [authMode, setAuthMode] = useState('login')
   const {
     register,
     control,
+    setError,
     formState: { errors },
     handleSubmit,
   } = useForm()
   const [showForgetPassword, setShowForgetPassword] = useState(false)
-  const router = useRouter()
+  const { handleAuth } = useContext(UserContext)
 
   const handleClose = () => {
     setShowForgetPassword(false)
   }
 
-  const handleAuth = async (data: any) => {
+  const AuthSumbit = async (data: any) => {
     const { email, password, confirmPassword } = data
-    const supabaseClient = createBrowserSupabaseClient()
     try {
-      const {
-        error,
-        data: { user },
-      } =
-        authMode === 'login'
-          ? await supabaseClient.auth
-              .signInWithPassword({
-                email,
-                password,
-              })
-              .then((res) => {
-                router.push('/channels/1')
-                return res
-              })
-          : password === confirmPassword
-          ? await supabaseClient.auth.signUp({ email, password })
-          : {
-              error: { message: 'Password does not match' },
-              data: { user: null },
-            }
-      if (error) {
-        alert('Error with auth: ' + error.message)
-      } else if (!user)
-        alert('Signup successful, confirmation mail should be sent soon!')
+      const { error } = await handleAuth(
+        email,
+        password,
+        confirmPassword && confirmPassword
+      )
+
+      error?.message &&
+        setError('password', {
+          type: 'custom',
+          message: `${error.message}`,
+        })
     } catch (error: any) {
       console.log('error', error)
-      alert(error.error_description || error)
     }
   }
 
   return (
     <Container>
       <ForgotPassModal onClose={handleClose} open={showForgetPassword} />
-      <Wrap onSubmit={handleSubmit(handleAuth)}>
+      <Wrap onSubmit={handleSubmit(AuthSumbit)}>
         <Inputs>
           <Input
             label={'Email'}
@@ -182,7 +169,7 @@ const Home = () => {
   )
 }
 
-const SignUp = styled.span`
+export const SignUp = styled.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme }) => theme.blue};
@@ -192,7 +179,7 @@ const SignUp = styled.span`
   }
 `
 
-const ImageWrap = styled.div`
+export const ImageWrap = styled.div`
   width: 100%;
   height: 100vh;
   background: #4f81a3;
@@ -205,17 +192,19 @@ const ImageWrap = styled.div`
   }
 `
 
-const StyledLottie = styled(Lottie)`
+export const StyledLottie = styled(Lottie)`
   max-width: 1000px;
   max-height: 1000px;
-  cursor: copy !important;
+  svg {
+    cursor: default !important;
+  }
   @media only screen and (max-width: 1700px) {
     max-width: 700px;
     max-height: 550px;
   }
 `
 
-const SocialButton = styled(Button)`
+export const SocialButton = styled(Button)`
   background-color: white;
   box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
@@ -230,22 +219,26 @@ const SocialButton = styled(Button)`
   }
 `
 
-const SocialButtons = styled.div`
+export const SocialButtons = styled.div`
   display: flex;
   gap: 5px;
 `
 
-const SignIn = styled(Button)`
+export const SignIn = styled(Button)`
   width: 100%;
   font-weight: 800;
   height: 45px;
   letter-spacing: 1px;
+  box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.15);
   border-radius: 5px;
+  &:hover {
+    box-shadow: none;
+  }
 `
 
-const AuthButtons = styled.div``
+export const AuthButtons = styled.div``
 
-const Inputs = styled.div`
+export const Inputs = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -258,7 +251,7 @@ const Inputs = styled.div`
   }
 `
 
-const Wrap = styled.form`
+export const Wrap = styled.form`
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -270,15 +263,19 @@ const Wrap = styled.form`
     max-width: 350px;
     padding: 1.5em 2em;
     min-width: 253px;
+    background: ${({ theme }) => theme.bg};
   }
 `
 
-const Container = styled.div`
+export const Container = styled.div`
   box-sizing: border-box;
   display: flex;
   min-height: 100vh;
   align-items: center;
   justify-content: center;
+  @media only screen and (max-width: 900px) {
+    background: ${({ theme }) => theme.darkBlue};
+  }
 `
 
 export default Home

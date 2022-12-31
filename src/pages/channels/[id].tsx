@@ -1,34 +1,37 @@
-import { addMessage, useStore } from "@/lib/Store";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from 'react'
 
-import Layout from "@/Layout";
-import Message from "@/components/Message";
-import MessageInput from "@/components/MessageInput";
-import UserContext from "@/lib/UserContext";
-import { useRouter } from "next/router";
+import Layout from '@/Layouts/UserLayout'
+import Message from '@/components/Elements/Message'
+import MessageInput from '@/components/Elements/MessageInput'
+import { UserContext } from '@/context/UserContext'
+import { addMessage } from '@/services/messages'
+import { useRouter } from 'next/router'
+import { useStore } from '@/hooks/useStore'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const ChannelsPage = () => {
-  const router = useRouter();
-  const { user, signIn } = useContext(UserContext);
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const router = useRouter()
+  const { user } = useContext(UserContext)
+  const messagesEndRef = useRef<null | HTMLDivElement>(null)
+  const supabaseClient = useSupabaseClient()
 
   // Else load up the page
-  const { id: channelId } = router.query;
-  const { messages, channels } = useStore({ channelId });
+  const { id: channelId } = router.query
+  const { messages, channels } = useStore({ channelId })
 
   useEffect(() => {
     messagesEndRef?.current?.scrollIntoView({
-      block: "start",
-      behavior: "smooth",
-    });
-  }, [messages]);
+      block: 'start',
+      behavior: 'smooth',
+    })
+  }, [messages])
 
   // redirect to public channel when current channel is deleted
   useEffect(() => {
     if (!channels.some((channel) => channel?.id === Number(channelId))) {
-      router.push("/channels/1");
+      router.push('/channels/1')
     }
-  }, [channels, channelId]);
+  }, [channels, channelId])
 
   // Render the channels and messages
   return (
@@ -45,13 +48,14 @@ const ChannelsPage = () => {
         <div className="p-2 absolute bottom-0 left-0 w-full">
           <MessageInput
             onSubmit={async (text: string) =>
-              user && addMessage(text, channelId as string, user.id)
+              user &&
+              addMessage(text, channelId as string, user.id, supabaseClient)
             }
           />
         </div>
       </div>
     </Layout>
-  );
-};
+  )
+}
 
-export default ChannelsPage;
+export default ChannelsPage

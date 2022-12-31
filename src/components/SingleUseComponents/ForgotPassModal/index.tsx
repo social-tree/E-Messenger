@@ -6,11 +6,14 @@ import {
   StyledModal,
 } from './ForgotPassModal.styles'
 import React, { useEffect, useState } from 'react'
+import {
+  useSessionContext,
+  useSupabaseClient,
+} from '@supabase/auth-helpers-react'
 
 import Mail from '@/assets/animations/mail.json'
 import { Typography } from '@mui/material'
 import { baseUrl } from '@/lib/axiosInstance'
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { useForm } from 'react-hook-form'
 
 interface Props {
@@ -29,7 +32,7 @@ const ForgotPassModal = ({ onClose, open }: Props) => {
     reset,
     formState: { errors },
   } = useForm()
-  const supabaseClient = createBrowserSupabaseClient()
+  const { supabaseClient } = useSessionContext()
 
   const handleForgotPass = async (data: any) => {
     const { email } = data
@@ -52,12 +55,17 @@ const ForgotPassModal = ({ onClose, open }: Props) => {
       <Container onSubmit={handleSubmit(handleForgotPass)}>
         {!emailSent ? (
           <>
-            <Typography variant="h1" sx={{ fontSize: 28 }}>
+            <Typography variant="h1" sx={{ fontSize: 28, fontWeight: 600 }}>
               Forgot Password?
             </Typography>
             <Typography
               variant="subtitle1"
-              sx={{ maxWidth: 350, textAlign: 'center', fontSize: 14, pt: 2 }}
+              sx={{
+                maxWidth: 350,
+                textAlign: 'center',
+                fontSize: 14,
+                pt: 2,
+              }}
             >
               Don’t worry! It happens. Please enter the email associated with
               your account.
@@ -80,7 +88,7 @@ const ForgotPassModal = ({ onClose, open }: Props) => {
               Please check the email address {watch('email')} for instructions
               to reset your password.
             </Typography>
-            <StyledButton>Resend email</StyledButton>
+            <StyledButton type="submit">Resend email</StyledButton>
           </>
         )}
       </Container>
