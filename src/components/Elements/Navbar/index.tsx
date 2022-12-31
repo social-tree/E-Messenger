@@ -10,9 +10,10 @@ import {
 } from './Navbar.styles'
 import { useContext, useState } from 'react'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import SettingsModal from '../SettingsModal'
-import UserContext from '@/lib/UserContext'
+import { UserContext } from '@/context/UserContext'
 
 interface Props {
   username?: string
@@ -21,8 +22,7 @@ interface Props {
 
 const Navbar = ({ username, time }: Props) => {
   const [openSettings, setOpenSettings] = useState<Element | null>(null)
-  const { user, signIn, signOut } = useContext(UserContext)
-  console.log(user)
+  const { user, signOut } = useContext(UserContext)
   const closeSettings = () => {
     setOpenSettings(null)
   }
@@ -49,12 +49,15 @@ const Navbar = ({ username, time }: Props) => {
           <>
             <SettingsIcon onClick={(e: any) => handleOpenSettings(e)} />
             <SettingsModal open={openSettings} onClose={closeSettings} />
-            <ProfileImage
-              onClick={() => signOut()}
-              src="https://i.pinimg.com/originals/c0/c2/16/c0c216b3743c6cb9fd67ab7df6b2c330.jpg"
-              width={52}
-              height={52}
-            />
+            <ProfileImage onClick={() => signOut()}>
+              <Image
+                src="https://i.pinimg.com/originals/c0/c2/16/c0c216b3743c6cb9fd67ab7df6b2c330.jpg"
+                width={52}
+                height={52}
+                layout="responsive"
+                alt="profile"
+              />
+            </ProfileImage>
           </>
         )}
       </ProfileInfo>

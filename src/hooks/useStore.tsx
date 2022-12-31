@@ -1,11 +1,12 @@
 import { ChannelType, ChannelsType } from '@/types/channels'
 import { MessageType, MessagesType } from '@/types/messeges'
-import { SetStateAction, useEffect, useState } from 'react'
-import { User, createClient } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
 
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-
-const supabaseClient = createBrowserSupabaseClient()
+import { User } from '@supabase/supabase-js'
+import { fetchChannels } from '@/services/channels'
+import { fetchMessages } from '@/services/messages'
+import { fetchUser } from '@/services/users'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 /**
  * @param {number} channelId the currently selected Channel
@@ -24,10 +25,12 @@ export const useStore = (props: { channelId: any }) => {
     null
   )
 
+  const supabaseClient = useSupabaseClient()
+
   // Load initial data and set up listeners
   useEffect(() => {
     // Get Channels
-    fetchChannels(setChannels)
+    fetchChannels(setChannels, supabaseClient)
     // Listen for new and deleted messages
     const messageListener = supabaseClient
       .channel('public:messages')
@@ -79,10 +82,14 @@ export const useStore = (props: { channelId: any }) => {
   // Update when the route changes
   useEffect(() => {
     if (props?.channelId > 0) {
-      fetchMessages(props.channelId, (messages: any[]) => {
-        messages.forEach((x) => users.set(x.user_id, x.author))
-        setMessages(messages)
-      })
+      fetchMessages(
+        props.channelId,
+        (messages: any[]) => {
+          messages.forEach((x) => users.set(x.user_id, x.author))
+          setMessages(messages)
+        },
+        supabaseClient
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.channelId])
@@ -93,7 +100,11 @@ export const useStore = (props: { channelId: any }) => {
       const handleAsync = async () => {
         let authorId = newMessage.user_id
         if (!users.get(authorId))
-          await fetchUser(authorId, (user: any) => handleNewOrUpdatedUser(user))
+          await fetchUser(
+            authorId,
+            (user: any) => handleNewOrUpdatedUser(user),
+            supabaseClient
+          )
         setMessages(messages.concat(newMessage))
       }
       handleAsync()
@@ -139,144 +150,5 @@ export const useStore = (props: { channelId: any }) => {
         ? channels.sort((a, b) => a.slug.localeCompare(b.slug))
         : [],
     users,
-  }
-}
-
-/**
- * Fetch all channels
- * @param {function} setState Optionally pass in a hook or callback to set the state
- */
-export const fetchChannels = async (setState: Function) => {
-  try {
-    let { data } = await supabaseClient.from('channels').select('*')
-    if (setState) setState(data)
-    return data
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Fetch a single user
- * @param {number} userId
- * @param {function} setState Optionally pass in a hook or callback to set the state
- */
-export const fetchUser = async (userId: string, setState: Function) => {
-  try {
-    let { data } = await supabaseClient
-      .from('users')
-      .select(`*`)
-      .eq('id', userId)
-    if (data) {
-      let user = data[0]
-      if (setState) setState(user)
-      return user
-    }
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Fetch all roles for the current user
- * @param {function} setState Optionally pass in a hook or callback to set the state
- */
-export const fetchUserRoles = async (setState: Function) => {
-  try {
-    let { data } = await supabaseClient.from('user_roles').select(`*`)
-    if (setState) setState(data)
-    return data
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Fetch all messages and their authors
- * @param {number} channelId
- * @param {function} setState Optionally pass in a hook or callback to set the state
- */
-export const fetchMessages = async (channelId: string, setState: Function) => {
-  try {
-    let { data } = await supabaseClient
-      .from('messages')
-      .select(`*, author:user_id(*)`)
-      .eq('channel_id', channelId)
-      .order('inserted_at', { ascending: true })
-    if (setState) setState(data)
-    return data
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Insert a new channel into the DB
- * @param {string} slug The channel name
- * @param {number} user_id The channel creator
- */
-export const addChannel = async (slug: string, user_id: string) => {
-  try {
-    let { data } = await supabaseClient
-      .from('channels')
-      .insert([{ slug, created_by: user_id }])
-      .select()
-    return data
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Insert a new message into the DB
- * @param {string} message The message text
- * @param {number} channel_id
- * @param {number} user_id The author
- */
-export const addMessage = async (
-  message: string,
-  channel_id: string,
-  user_id: string
-) => {
-  try {
-    let { data } = await supabaseClient
-      .from('messages')
-      .insert([{ message, channel_id, user_id }])
-      .select()
-    return data
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Delete a channel from the DB
- * @param {number} channel_id
- */
-export const deleteChannel = async (channel_id: string) => {
-  try {
-    let { data } = await supabaseClient
-      .from('channels')
-      .delete()
-      .match({ id: channel_id })
-    return data
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
- * Delete a message from the DB
- * @param {number} message_id
- */
-export const deleteMessage = async (message_id: string) => {
-  try {
-    let { data } = await supabaseClient
-      .from('messages')
-      .delete()
-      .match({ id: message_id })
-    return data
-  } catch (error) {
-    console.log('error', error)
   }
 }

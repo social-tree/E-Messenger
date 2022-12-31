@@ -1,20 +1,20 @@
-import { Modal, Typography } from '@mui/material'
+import {
+  AuthButtons,
+  Container,
+  ImageWrap,
+  Inputs,
+  SignIn,
+  StyledLottie,
+  Wrap,
+} from '.'
 import { useEffect, useState } from 'react'
 
-import Button from '@/components/Button'
 import ChatAnimation from '@/assets/animations/chat.json'
-import ForgotPassModal from '@/components/ForgotPassModal'
-import Google from '@/assets/icons/Google.svg'
-import Image from 'next/image'
-import { Input } from '@/components/Input'
-import Layout from '@/Layout'
-import Lottie from 'lottie-react'
+import { Input } from '@/components/Elements/Input'
+import { Typography } from '@mui/material'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import styled from '@emotion/styled'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { useUser } from '@supabase/auth-helpers-react'
 
 const ForgotPassword = () => {
   const {
@@ -25,6 +25,8 @@ const ForgotPassword = () => {
   } = useForm()
   const supabaseClient = createBrowserSupabaseClient()
 
+  const router = useRouter()
+
   const handleAuth = async (data: any) => {
     const { password, confirmPassword } = data
     if (password !== confirmPassword) return
@@ -32,6 +34,9 @@ const ForgotPassword = () => {
       const { data, error } = await supabaseClient.auth.updateUser({
         password,
       })
+      if (data) {
+        throw router.push('/')
+      }
     } catch (error: any) {}
   }
 
@@ -86,75 +91,5 @@ const ForgotPassword = () => {
     </Container>
   )
 }
-
-const ImageWrap = styled.div`
-  width: 100%;
-  height: 100vh;
-  background: ${({ theme }) => theme.blue};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @media only screen and (max-width: 900px) {
-    display: none;
-  }
-`
-
-const StyledLottie = styled(Lottie)`
-  max-width: 1000px;
-  max-height: 1000px;
-  cursor: copy !important;
-  @media only screen and (max-width: 1700px) {
-    max-width: 700px;
-    max-height: 550px;
-  }
-`
-
-const SignIn = styled(Button)`
-  width: 100%;
-  font-weight: 800;
-  height: 45px;
-  letter-spacing: 1px;
-  border-radius: 5px;
-`
-
-const AuthButtons = styled.div``
-
-const Inputs = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  @media only screen and (max-width: 400px) {
-    .MuiFormControl-root,
-    .MuiInputBase-root {
-      min-width: 203px;
-    }
-  }
-`
-
-const Wrap = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 700px;
-  padding: 1.5em 5em;
-  border-radius: 15px;
-  min-width: 363px;
-
-  @media only screen and (max-width: 900px) {
-    max-width: 350px;
-    padding: 1.5em 2em;
-    min-width: 253px;
-  }
-`
-
-const Container = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-`
 
 export default ForgotPassword

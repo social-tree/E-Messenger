@@ -1,20 +1,13 @@
 import { ChannelType, ChannelsType } from '@/types/channels'
-import {
-  JSXElementConstructor,
-  ReactElement,
-  ReactFragment,
-  ReactPortal,
-  useContext,
-} from 'react'
-import { addChannel, deleteChannel } from '@/lib/Store'
+import { addChannel, deleteChannel } from '@/services/channels'
 
-import { Container } from './Layout.styles'
+import { Container } from './UserLayout.styles'
 import Link from 'next/link'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/Elements/Navbar'
 import TrashIcon from '@/assets/icons/TrashIcon'
 import { User } from '@supabase/supabase-js'
-import UserContext from '@/lib/UserContext'
-import { UserType } from '@/types/users'
+import { UserContext } from '@/context/UserContext'
+import { useContext } from 'react'
 import { userRolesType } from '@/types/user_roles'
 
 interface Props {
@@ -25,13 +18,13 @@ interface Props {
   time?: string
 }
 
-export default function Layout({
+const UserLayout: React.FC<Props> = ({
   channels,
   activeChannelId,
   children,
   username,
   time,
-}: Props) {
+}) => {
   const { signOut, user, userRoles } = useContext(UserContext)
 
   const slugify = (text: string) => {
@@ -117,3 +110,5 @@ const SidebarItem = ({
     </li>
   </>
 )
+
+export default UserLayout
