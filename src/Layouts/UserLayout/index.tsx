@@ -4,7 +4,7 @@ import { addChannel, deleteChannel } from '@/services/channels'
 
 import { Container } from './UserLayout.styles'
 import Link from 'next/link'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/Elements/Navbar'
 import TrashIcon from '@/assets/icons/TrashIcon'
 import { UserContext } from '@/context/UserContext'
 import { useContext } from 'react'
@@ -28,7 +28,6 @@ const UserLayout: React.FC<Props> = ({
 }) => {
   const { signOut, user } = useContext(UserContext)
   const supabaseClient = useSupabaseClient()
-  console.log(user)
 
   const slugify = (text: string) => {
     return text

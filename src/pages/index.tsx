@@ -3,7 +3,7 @@ import { useContext, useState } from 'react'
 
 import Button from '@/components/Elements/Button'
 import ChatAnimation from '@/assets/animations/chat.json'
-import ForgotPassModal from '@/components/ForgotPassModal'
+import ForgotPassModal from '@/components/SingleUseComponents/ForgotPassModal'
 import Google from '@/assets/icons/Google.svg'
 import Image from 'next/image'
 import { Input } from '@/components/Elements/Input'
