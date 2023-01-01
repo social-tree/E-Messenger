@@ -1,22 +1,25 @@
 import { MessageType } from '@/types/messeges'
 import TrashIcon from '@/assets/icons/TrashIcon'
-import UserContext from '@/context/UserContext'
-import { deleteMessage } from '@/hooks/useStore'
+import { UserContext } from '@/context/UserContext'
+import { deleteMessage } from '@/services/messages'
 import { useContext } from 'react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 interface Props {
   message: MessageType
 }
 
 const Message = ({ message }: Props) => {
-  const { user, userRoles } = useContext(UserContext)
+  const { user } = useContext(UserContext)
+  const supabaseClient = useSupabaseClient()
 
   return (
     <div className="py-1 flex items-center space-x-2">
       <div className="text-gray-100 w-4">
-        {(user?.id === message.user_id ||
-          userRoles?.some((role) => ['admin', 'moderator'].includes(role))) && (
-          <button onClick={() => deleteMessage(`${message.id}`)}>
+        {user?.id === message.user_id && (
+          <button
+            onClick={() => deleteMessage(`${message.id}`, supabaseClient)}
+          >
             <TrashIcon />
           </button>
         )}

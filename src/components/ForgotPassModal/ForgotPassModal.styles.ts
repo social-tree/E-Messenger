@@ -1,5 +1,5 @@
-import Button from '../../Elements/Button'
-import { Input } from '../../Elements/Input'
+import Button from '../Elements/Button'
+import { Input } from '../Elements/Input'
 import Lottie from 'lottie-react'
 import { Modal } from '@mui/material'
 import styled from '@emotion/styled'

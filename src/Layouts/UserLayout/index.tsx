@@ -1,13 +1,14 @@
 import { ChannelType, ChannelsType } from '@/types/channels'
+import { SupabaseClient, User } from '@supabase/supabase-js'
 import { addChannel, deleteChannel } from '@/services/channels'
 
 import { Container } from './UserLayout.styles'
 import Link from 'next/link'
-import Navbar from '@/components/Elements/Navbar'
+import Navbar from '@/components/Navbar'
 import TrashIcon from '@/assets/icons/TrashIcon'
-import { User } from '@supabase/supabase-js'
 import { UserContext } from '@/context/UserContext'
 import { useContext } from 'react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { userRolesType } from '@/types/user_roles'
 
 interface Props {
@@ -25,7 +26,9 @@ const UserLayout: React.FC<Props> = ({
   username,
   time,
 }) => {
-  const { signOut, user, userRoles } = useContext(UserContext)
+  const { signOut, user } = useContext(UserContext)
+  const supabaseClient = useSupabaseClient()
+  console.log(user)
 
   const slugify = (text: string) => {
     return text
@@ -41,7 +44,7 @@ const UserLayout: React.FC<Props> = ({
   const newChannel = async () => {
     const slug = prompt('Please enter your name')
     if (slug && user) {
-      addChannel(slugify(slug), user.id)
+      addChannel(slugify(slug), user.id, supabaseClient)
     }
   }
 
@@ -69,7 +72,7 @@ const UserLayout: React.FC<Props> = ({
                   key={x.id}
                   isActiveChannel={`${x.id}` === activeChannelId}
                   user={user}
-                  userRoles={userRoles}
+                  supabaseClient={supabaseClient}
                 />
               ))}
             </ul>
@@ -88,6 +91,7 @@ interface SidebarItemProps {
   isActiveChannel: boolean
   user?: User | null
   userRoles?: userRolesType
+  supabaseClient: SupabaseClient
 }
 
 const SidebarItem = ({
@@ -95,6 +99,7 @@ const SidebarItem = ({
   isActiveChannel,
   user,
   userRoles,
+  supabaseClient,
 }: SidebarItemProps) => (
   <>
     <li className="flex items-center justify-between">
@@ -103,7 +108,9 @@ const SidebarItem = ({
       </Link>
       {channel.id !== 1 &&
         (channel.created_by === user?.id || userRoles?.includes('admin')) && (
-          <button onClick={() => deleteChannel(`${channel.id}`)}>
+          <button
+            onClick={() => deleteChannel(`${channel.id}`, supabaseClient)}
+          >
             <TrashIcon />
           </button>
         )}
