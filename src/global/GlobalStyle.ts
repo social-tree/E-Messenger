@@ -1,7 +1,7 @@
-import { css } from "@emotion/react";
+import { css } from '@emotion/react'
 
 export const GlobalStyle = css`
-  @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap");
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap');
 
   *,
   *::after,
@@ -21,7 +21,7 @@ export const GlobalStyle = css`
   }
   html,
   body {
-    font-family: "Plus Jakarta Sans", sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     width: 100%;
     height: 100%;
   }
@@ -47,4 +47,8 @@ export const GlobalStyle = css`
     border: unset;
     outline: unset;
   }
-`;
+
+  #__next {
+    height: 100vh;
+  }
+`

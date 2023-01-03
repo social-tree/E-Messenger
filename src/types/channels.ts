@@ -1,8 +1,11 @@
-export type ChannelType = {
-  id: number;
-  inserted_at: string;
-  created_by: string;
-  slug: string;
-};
+import { UserType } from './users'
 
-export type ChannelsType = ChannelType[];
+export type ChannelType = {
+  id: number
+  inserted_at: string
+  created_by: UserType
+  slug: string
+  to_user: UserType
+}
+
+export type ChannelsType = ChannelType[]

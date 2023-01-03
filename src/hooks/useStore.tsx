@@ -1,8 +1,9 @@
 import { ChannelType, ChannelsType } from '@/types/channels'
 import { MessageType, MessagesType } from '@/types/messeges'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { User } from '@supabase/supabase-js'
+import { UserContext } from '@/context/UserContext'
 import { fetchChannels } from '@/services/channels'
 import { fetchMessages } from '@/services/messages'
 import { fetchUser } from '@/services/users'
@@ -15,6 +16,7 @@ export const useStore = (props: { channelId: any }) => {
   const [channels, setChannels] = useState<ChannelsType>([])
   const [messages, setMessages] = useState<MessagesType>([])
   const [users] = useState(new Map())
+  const { user } = useContext(UserContext)
   const [newMessage, handleNewMessage] = useState<MessageType | null>(null)
   const [newChannel, handleNewChannel] = useState(null)
   const [newOrUpdatedUser, handleNewOrUpdatedUser] = useState<User | null>(null)
@@ -30,7 +32,7 @@ export const useStore = (props: { channelId: any }) => {
   // Load initial data and set up listeners
   useEffect(() => {
     // Get Channels
-    fetchChannels(setChannels, supabaseClient)
+    user?.id && fetchChannels(setChannels, user.id, supabaseClient)
     // Listen for new and deleted messages
     const messageListener = supabaseClient
       .channel('public:messages')
@@ -77,7 +79,7 @@ export const useStore = (props: { channelId: any }) => {
       supabaseClient.removeChannel(userListener)
       supabaseClient.removeChannel(channelListener)
     }
-  }, [])
+  }, [user?.id])
 
   // Update when the route changes
   useEffect(() => {

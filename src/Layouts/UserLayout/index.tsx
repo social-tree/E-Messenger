@@ -1,8 +1,9 @@
 import { ChannelType, ChannelsType } from '@/types/channels'
+import { Container, UserMessages, Wrap } from './UserLayout.styles'
 import { SupabaseClient, User } from '@supabase/supabase-js'
 import { addChannel, deleteChannel } from '@/services/channels'
 
-import { Container } from './UserLayout.styles'
+import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/Elements/Navbar'
 import TrashIcon from '@/assets/icons/TrashIcon'
@@ -50,37 +51,31 @@ const UserLayout: React.FC<Props> = ({
   return (
     <Container>
       <Navbar username={username} time={time} />
-      {/* Sidebar */}
-      {channels && activeChannelId && (
-        <nav style={{ maxWidth: '20%', minWidth: 150, maxHeight: '100vh' }}>
-          <div>
+      <Wrap>
+        {/* Sidebar */}
+        {channels && activeChannelId && (
+          <nav style={{ maxWidth: '20%', minWidth: 150 }}>
             <div>
+              {/*  <div>
               <button onClick={() => newChannel()}>New Channel</button>
+            </div> */}
+              <h4>Channels</h4>
+              <ul>
+                {channels.map((x) => (
+                  <SidebarItem
+                    channel={x}
+                    key={x.id}
+                    isActiveChannel={`${x.id}` === activeChannelId}
+                    user={user}
+                    supabaseClient={supabaseClient}
+                  />
+                ))}
+              </ul>
             </div>
-            <hr />
-            <div>
-              <h6>{user?.email}</h6>
-              <button onClick={() => signOut()}>Log out</button>
-            </div>
-            <hr />
-            <h4>Channels</h4>
-            <ul>
-              {channels.map((x) => (
-                <SidebarItem
-                  channel={x}
-                  key={x.id}
-                  isActiveChannel={`${x.id}` === activeChannelId}
-                  user={user}
-                  supabaseClient={supabaseClient}
-                />
-              ))}
-            </ul>
-          </div>
-        </nav>
-      )}
-
-      {/* Messages */}
-      <div>{children}</div>
+          </nav>
+        )}
+        <UserMessages></UserMessages>
+      </Wrap>
     </Container>
   )
 }
@@ -89,30 +84,25 @@ interface SidebarItemProps {
   channel: ChannelType
   isActiveChannel: boolean
   user?: User | null
-  userRoles?: userRolesType
   supabaseClient: SupabaseClient
 }
 
-const SidebarItem = ({
-  channel,
-  isActiveChannel,
-  user,
-  userRoles,
-  supabaseClient,
-}: SidebarItemProps) => (
+const SidebarItem = ({ channel, isActiveChannel, user }: SidebarItemProps) => (
   <>
-    <li className="flex items-center justify-between">
+    <li>
+      <Image
+        src={`${
+          channel?.to_user.id === user?.id
+            ? channel?.created_by.avatar
+            : channel?.to_user.avatar
+        }`}
+        width="33"
+        height="33"
+        alt={'profile image'}
+      />
       <Link href="/channels/[id]" as={`/channels/${channel.id}`}>
-        <a className={isActiveChannel ? 'font-bold' : ''}>{channel.slug}</a>
+        <a>{channel.slug}</a>
       </Link>
-      {channel.id !== 1 &&
-        (channel.created_by === user?.id || userRoles?.includes('admin')) && (
-          <button
-            onClick={() => deleteChannel(`${channel.id}`, supabaseClient)}
-          >
-            <TrashIcon />
-          </button>
-        )}
     </li>
   </>
 )

@@ -46,10 +46,19 @@ export const deleteChannel = async (
  */
 export const fetchChannels = async (
   setState: Function,
+  id: string,
   supabaseClient: SupabaseClient
 ) => {
   try {
-    let { data } = await supabaseClient.from('channels').select('*')
+    let { data } = await supabaseClient
+      .from('channels')
+      .select(
+        `*, to_user:users!channels_to_user_fkey(*),created_by:users!channels_created_by_fkey(*),messages:messages!id(*)`
+      )
+      .or(`created_by.eq.${id},to_user.eq.${id}`)
+      .order('inserted_at', { ascending: false, foreignTable: 'messages' })
+      .limit(1, { foreignTable: 'messages' })
+
     if (setState) setState(data)
     return data
   } catch (error) {
