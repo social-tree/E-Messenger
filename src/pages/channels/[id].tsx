@@ -5,6 +5,7 @@ import Message from '@/components/Elements/Message'
 import MessageInput from '@/components/Elements/MessageInput'
 import { UserContext } from '@/context/UserContext'
 import { addMessage } from '@/services/messages'
+import styled from '@emotion/styled'
 import { useRouter } from 'next/router'
 import { useStore } from '@/hooks/useStore'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -19,24 +20,24 @@ const ChannelsPage = () => {
   const { id: channelId } = router.query
   const { messages, channels } = useStore({ channelId })
 
-  useEffect(() => {
+  /* useEffect(() => {
     messagesEndRef?.current?.scrollIntoView({
       block: 'start',
       behavior: 'smooth',
     })
-  }, [messages])
+  }, [messages]) */
 
   // redirect to public channel when current channel is deleted
-  useEffect(() => {
+  /* useEffect(() => {
     if (!channels.some((channel) => channel?.id === Number(channelId))) {
       router.push('/channels/1')
     }
-  }, [channels, channelId])
+  }, [channels, channelId]) */
 
   // Render the channels and messages
   return (
     <Layout channels={channels} activeChannelId={channelId as string}>
-      <div className="relative h-screen">
+      <Container>
         <div className="Messages h-full pb-16">
           <div className="p-2 overflow-y-auto">
             {messages.map((x) => (
@@ -53,9 +54,11 @@ const ChannelsPage = () => {
             }
           />
         </div>
-      </div>
+      </Container>
     </Layout>
   )
 }
+
+const Container = styled.div``
 
 export default ChannelsPage
