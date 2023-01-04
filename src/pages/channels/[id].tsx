@@ -38,15 +38,15 @@ const ChannelsPage = () => {
   return (
     <Layout channels={channels} activeChannelId={channelId as string}>
       <Container>
-        <div className="Messages h-full pb-16">
-          <div className="p-2 overflow-y-auto">
+        <div>
+          <div>
             {messages.map((x) => (
               <Message key={x.id} message={x} />
             ))}
             <div ref={messagesEndRef} style={{ height: 0 }} />
           </div>
         </div>
-        <div className="p-2 absolute bottom-0 left-0 w-full">
+        <div>
           <MessageInput
             onSubmit={async (text: string) =>
               user &&
@@ -59,6 +59,8 @@ const ChannelsPage = () => {
   )
 }
 
-const Container = styled.div``
+const Container = styled.div`
+  padding: 0px 80px;
+`
 
 export default ChannelsPage

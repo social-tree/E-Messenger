@@ -7,6 +7,7 @@ export const theme: { light: ThemeType; dark: ThemeType } = {
     blue: '#2595FF',
     darkBlue: '#4f81a3',
     grey: '#CDD5DE',
+    darkGrey: '#616C76',
     text: '#0E1114',
   }),
 
@@ -16,6 +17,7 @@ export const theme: { light: ThemeType; dark: ThemeType } = {
     blue: '#2595FF',
     darkBlue: '#4f81a3',
     grey: '#CDD5DE',
+    darkGrey: '#616C76',
     text: '#EEF1F4',
   }),
 }
@@ -25,6 +27,7 @@ export type ThemeType = {
   lightBg: string
   blue: string
   darkBlue: string
+  darkGrey: string
   grey: string
   text: string
 }
