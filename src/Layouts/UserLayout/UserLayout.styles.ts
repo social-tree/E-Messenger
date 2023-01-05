@@ -11,5 +11,5 @@ export const Wrap = styled.div`
 `
 
 export const Container = styled.main`
-  height: 100%;
+  height: calc(100vh - 56px);
 `

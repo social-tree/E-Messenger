@@ -1,5 +1,4 @@
 export const FormatDate = (date: string, type: string) => {
-  console.log(`${new Date(date).getUTCHours()}:${new Date(date).getMinutes()}`)
   switch (type) {
     case 'hour':
       const hour = new Date(date).getUTCHours()

@@ -9,6 +9,7 @@ export const theme: { light: ThemeType; dark: ThemeType } = {
     grey: '#CDD5DE',
     darkGrey: '#616C76',
     text: '#0E1114',
+    green: `#1D9745`,
   }),
 
   dark: createTheme({
@@ -19,6 +20,7 @@ export const theme: { light: ThemeType; dark: ThemeType } = {
     grey: '#CDD5DE',
     darkGrey: '#616C76',
     text: '#EEF1F4',
+    green: `#1D9745`,
   }),
 }
 
@@ -29,10 +31,17 @@ export type ThemeType = {
   darkBlue: string
   darkGrey: string
   grey: string
+  green: string
   text: string
 }
 
-declare module '@mui/material/styles' {
+declare module '@mui/material/styles/index' {
+  interface Theme extends ThemeType {}
+  // allow configuration using `createTheme`
+  interface ThemeOptions extends ThemeType {}
+}
+
+declare module '@emotion/react/types/index' {
   interface Theme extends ThemeType {}
   // allow configuration using `createTheme`
   interface ThemeOptions extends ThemeType {}
