@@ -9,6 +9,7 @@ export const StyledInput = styled(Input)`
   .MuiOutlinedInput-notchedOutline {
     border: none;
   }
+  background-color: ${({ theme }) => theme.lightBg}50;
 `
 
 export const StyledButton = styled(Button)`
@@ -33,6 +34,7 @@ export const Additional = styled.div`
   gap: 20px;
   align-items: center;
   border-top: 1px solid ${({ theme }) => theme.grey};
+  background-color: ${({ theme }) => theme.lightBg};
 `
 
 export const Container = styled.form`
@@ -40,6 +42,7 @@ export const Container = styled.form`
   max-width: 520px;
   width: 100%;
   border-radius: 12px;
+  overflow: hidden;
   align-self: center;
   margin-top: auto;
 `

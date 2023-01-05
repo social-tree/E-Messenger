@@ -17,7 +17,7 @@ export const theme: { light: ThemeType; dark: ThemeType } = {
     lightBg: '#21262B',
     blue: '#2595FF',
     darkBlue: '#4f81a3',
-    grey: '#CDD5DE',
+    grey: '#4A545C',
     darkGrey: '#616C76',
     text: '#EEF1F4',
     green: `#1D9745`,

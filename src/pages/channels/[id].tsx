@@ -44,9 +44,22 @@ const ChannelsPage = () => {
     >
       <Container>
         <Messages>
-          {messages.map((x) => (
-            <Message key={x.id} message={x} />
-          ))}
+          {messages?.map((x, index) => {
+            const orderType =
+              messages[index - 1]?.author?.id !== x.author.id &&
+              messages[index + 1]?.author?.id !== x.author.id
+                ? 'first'
+                : messages[index - 1]?.author?.id !== x.author.id
+                ? 'start'
+                : messages[index + 1]?.author?.id === x.author.id
+                ? 'middle'
+                : messages[index - 1]?.author?.id === x.author.id &&
+                  messages[index + 1]?.author?.id !== x.author.id
+                ? 'end'
+                : 'other'
+
+            return <Message orderType={orderType} key={x.id} message={x} />
+          })}
           <div ref={messagesEndRef} style={{ height: 0 }} />
         </Messages>
         <MessageInput

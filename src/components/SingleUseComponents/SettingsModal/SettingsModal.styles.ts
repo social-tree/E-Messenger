@@ -1,15 +1,21 @@
-import { Modal, Popover } from "@mui/material";
+import { Modal, Popover } from '@mui/material'
 
-import { ThemeType } from "@/global/theme";
-import styled from "@emotion/styled";
+import { ThemeType } from '@/global/theme'
+import styled from '@emotion/styled'
 
-export const Name = styled.p``;
+export const Name = styled.p``
 
-export const Row = styled.div``;
+export const Row = styled.div``
 
-export const Container = styled.div`
-  background-color: ${({ theme }) => theme.bg};
+export const Container = styled.form`
   max-width: 300px;
-`;
+  padding: 20px;
+`
 
-export const StyledPopover = styled(Popover)``;
+export const StyledPopover = styled(Popover)`
+  .MuiPaper-root {
+    border-radius: 10px;
+    background-color: ${({ theme }) => theme.lightBg};
+    color: ${({ theme }) => theme.text};
+  }
+`

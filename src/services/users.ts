@@ -4,7 +4,9 @@ import { SupabaseClient, useSessionContext } from '@supabase/auth-helpers-react'
  * Fetch a single user
  * @param {number} userId
  * @param {function} setState Optionally pass in a hook or callback to set the state
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
+
 export const fetchUser = async (
   userId: string,
   setState: Function,
@@ -28,7 +30,9 @@ export const fetchUser = async (
 /**
  * Fetch all roles for the current user
  * @param {function} setState Optionally pass in a hook or callback to set the state
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
+
 export const fetchUserRoles = async (
   setState: Function,
   supabaseClient: SupabaseClient

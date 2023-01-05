@@ -4,7 +4,9 @@ import { SupabaseClient, useSessionContext } from '@supabase/auth-helpers-react'
  * Fetch all messages and their authors
  * @param {number} channelId
  * @param {function} setState Optionally pass in a hook or callback to set the state
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
+
 export const fetchMessages = async (
   channelId: string,
   setState: Function,
@@ -28,7 +30,9 @@ export const fetchMessages = async (
  * @param {string} message The message text
  * @param {number} channel_id
  * @param {number} user_id The author
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
+
 export const addMessage = async (
   message: string,
   channel_id: string,
@@ -49,7 +53,9 @@ export const addMessage = async (
 /**
  * Delete a message from the DB
  * @param {number} message_id
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
+
 export const deleteMessage = async (
   message_id: string,
   supabaseClient: SupabaseClient

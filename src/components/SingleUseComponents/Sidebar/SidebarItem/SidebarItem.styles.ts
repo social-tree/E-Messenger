@@ -2,7 +2,12 @@ import styled from '@emotion/styled'
 import Link from 'next/link'
 
 export const LastMessage = styled.p`
-  color: ${({ theme }) => theme.darkGrey};
+  color: ${({ theme }) => theme.text};
+  height: 40px;
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `
 
 export const Name = styled.p`
@@ -52,6 +57,9 @@ export const Container = styled.li<{ isActiveChannel: boolean }>`
   width: 100%;
   background-color: ${({ theme, isActiveChannel }) =>
     isActiveChannel && `${theme.grey}40`};
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   &:hover {
     cursor: pointer;

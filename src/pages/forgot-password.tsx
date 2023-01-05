@@ -7,7 +7,6 @@ import {
   StyledLottie,
   Wrap,
 } from '.'
-import { useEffect, useState } from 'react'
 
 import ChatAnimation from '@/assets/animations/chat.json'
 import { Input } from '@/components/Elements/Input'
@@ -39,17 +38,6 @@ const ForgotPassword = () => {
       }
     } catch (error: any) {}
   }
-
-  useEffect(() => {
-    const {
-      data: { subscription: authListener },
-    } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      console.log(event, session, 'W')
-    })
-    return () => {
-      authListener.unsubscribe()
-    }
-  }, [])
 
   return (
     <Container>
