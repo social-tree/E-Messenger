@@ -1,32 +1,51 @@
-import { KeyboardEvent, useState } from "react";
-
+import { KeyboardEvent, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import {
+  Container,
+  StyledButton,
+  StyledInput,
+  Additional,
+} from './MessageInput.styles'
+import Microphone from '@/assets/icons/microphone.svg'
+import Clip from '@/assets/icons/clip.svg'
+import Button from '../Button'
 interface Props {
-  onSubmit: (text: string) => void;
+  onSubmit: (text: string) => void
 }
 
 const MessageInput = ({ onSubmit }: Props) => {
-  const [messageText, setMessageText] = useState("");
+  const {
+    register,
+    control,
+    formState: errors,
+    handleSubmit,
+    reset,
+  } = useForm()
 
-  const submitOnEnter = (event: KeyboardEvent<HTMLInputElement>) => {
-    // Watch for enter key
-    if (event.keyCode === 13) {
-      onSubmit(messageText);
-      setMessageText("");
+  const handleFormSubmit = (data: { message?: string }) => {
+    if (data.message) {
+      onSubmit(data?.message)
+      reset({ message: '' })
     }
-  };
+  }
 
   return (
-    <>
-      <input
-        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        type="text"
-        placeholder="Send a message"
-        value={messageText}
-        onChange={(e) => setMessageText(e.target.value)}
-        onKeyDown={(e) => submitOnEnter(e)}
+    <Container onSubmit={handleSubmit(handleFormSubmit)}>
+      <StyledInput
+        {...register('message', {
+          required: 'Write a message',
+        })}
+        inputProps={{ placeholder: 'Write a message...' }}
+        errors={errors}
+        control={control}
       />
-    </>
-  );
-};
+      <Additional>
+        <Microphone />
+        <Clip />
+        <StyledButton type="submit">Send</StyledButton>
+      </Additional>
+    </Container>
+  )
+}
 
-export default MessageInput;
+export default MessageInput

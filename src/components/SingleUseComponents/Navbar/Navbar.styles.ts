@@ -58,8 +58,7 @@ export const ProfileInfo = styled.div`
 
 export const Container = styled.nav<{ openSettings: boolean }>`
   box-shadow: 0px 1px 2px rgba(2, 17, 37, 0.12);
-  padding: ${({ openSettings }) =>
-    openSettings ? '0px 41px 0px 24px' : '0px 24px'};
+  padding: 0px 24px;
   display: flex;
   align-items: center;
 `

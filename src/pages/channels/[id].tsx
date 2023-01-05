@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef } from 'react'
 
-import Layout from '@/Layouts/UserLayout'
+import UserLayout from '@/Layouts/UserLayout'
 import Message from '@/components/Elements/Message'
 import MessageInput from '@/components/Elements/MessageInput'
 import { UserContext } from '@/context/UserContext'
@@ -9,6 +9,7 @@ import styled from '@emotion/styled'
 import { useRouter } from 'next/router'
 import { useStore } from '@/hooks/useStore'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { channel } from 'diagnostics_channel'
 
 const ChannelsPage = () => {
   const router = useRouter()
@@ -36,26 +37,26 @@ const ChannelsPage = () => {
 
   // Render the channels and messages
   return (
-    <Layout channels={channels} activeChannelId={channelId as string}>
+    <UserLayout
+      user={user}
+      channels={channels}
+      activeChannelId={channelId as string}
+    >
       <Container>
-        <div>
-          <Messages>
-            {messages.map((x) => (
-              <Message key={x.id} message={x} />
-            ))}
-            <div ref={messagesEndRef} style={{ height: 0 }} />
-          </Messages>
-        </div>
-        <div>
-          <MessageInput
-            onSubmit={async (text: string) =>
-              user &&
-              addMessage(text, channelId as string, user.id, supabaseClient)
-            }
-          />
-        </div>
+        <Messages>
+          {messages.map((x) => (
+            <Message key={x.id} message={x} />
+          ))}
+          <div ref={messagesEndRef} style={{ height: 0 }} />
+        </Messages>
+        <MessageInput
+          onSubmit={async (message: string) =>
+            user &&
+            addMessage(message, channelId as string, user.id, supabaseClient)
+          }
+        />
       </Container>
-    </Layout>
+    </UserLayout>
   )
 }
 
@@ -64,7 +65,7 @@ export const Messages = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   gap: 24px;
-  max-height: 800px;
+  max-height: calc(100vh - 196px);
   overflow-y: scroll;
   padding-top: 10px;
   ::-webkit-scrollbar {
@@ -73,7 +74,11 @@ export const Messages = styled.div`
 `
 
 const Container = styled.div`
-  padding: 0px 80px;
+  padding: 0px 80px 20px 80px;
+  max-height: calc(100vh - 56px);
+  display: flex;
+  height: 100%;
+  flex-direction: column;
 `
 
 export default ChannelsPage

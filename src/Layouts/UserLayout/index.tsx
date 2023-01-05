@@ -12,12 +12,14 @@ import { useContext } from 'react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { userRolesType } from '@/types/user_roles'
 import Sidebar from '@/components/SingleUseComponents/Sidebar'
+import { getUserFromChannel } from '@/helpers/getOtherUser'
+import { UserType } from '@/types/users'
 
 interface Props {
-  channels?: ChannelsType
-  activeChannelId?: string
+  channels: ChannelsType
+  activeChannelId: string
   children: JSX.Element[] | JSX.Element
-  username?: string
+  user?: User | null
   time?: string
 }
 
@@ -25,7 +27,7 @@ const UserLayout: React.FC<Props> = ({
   channels,
   activeChannelId,
   children,
-  username,
+  user,
   time,
 }) => {
   const slugify = (text: string) => {
@@ -39,9 +41,12 @@ const UserLayout: React.FC<Props> = ({
       .replace(/-+$/, '') // Trim - from end of text
   }
 
+  const otherUser =
+    user && getUserFromChannel(user, channels[Number(activeChannelId) - 1])
+
   return (
     <Container>
-      <Navbar username={username} time={time} />
+      <Navbar username={otherUser?.username} time={time} />
       <Wrap>
         {/* Sidebar */}
         {channels && activeChannelId && (
