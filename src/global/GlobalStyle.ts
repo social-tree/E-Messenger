@@ -49,6 +49,6 @@ export const GlobalStyle = css`
   }
 
   #__next {
-    height: 100vh;
+    height: 100%;
   }
 `

@@ -20,12 +20,12 @@ const ChannelsPage = () => {
   const { id: channelId } = router.query
   const { messages, channels } = useStore({ channelId })
 
-  /* useEffect(() => {
+  useEffect(() => {
     messagesEndRef?.current?.scrollIntoView({
       block: 'start',
       behavior: 'smooth',
     })
-  }, [messages]) */
+  }, [messages])
 
   // redirect to public channel when current channel is deleted
   /* useEffect(() => {
@@ -39,12 +39,12 @@ const ChannelsPage = () => {
     <Layout channels={channels} activeChannelId={channelId as string}>
       <Container>
         <div>
-          <div>
+          <Messages>
             {messages.map((x) => (
               <Message key={x.id} message={x} />
             ))}
             <div ref={messagesEndRef} style={{ height: 0 }} />
-          </div>
+          </Messages>
         </div>
         <div>
           <MessageInput
@@ -58,6 +58,19 @@ const ChannelsPage = () => {
     </Layout>
   )
 }
+
+export const Messages = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 24px;
+  max-height: 800px;
+  overflow-y: scroll;
+  padding-top: 10px;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`
 
 const Container = styled.div`
   padding: 0px 80px;

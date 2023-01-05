@@ -39,13 +39,12 @@ export const useStore = (props: { channelId: any }) => {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => /* handleNewMessage(payload.new) */ console.log(payload)
+        (payload) => handleNewMessage(payload.new as MessageType)
       )
       .on(
         'postgres_changes',
         { event: 'DELETE', schema: 'public', table: 'messages' },
-        (payload) =>
-          /* handleDeletedMessage(payload.old) */ console.log(payload)
+        (payload) => handleDeletedMessage(payload.old as MessageType)
       )
       .subscribe()
     // Listen for changes to our users
