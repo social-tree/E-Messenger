@@ -1,31 +1,30 @@
-import { AuthResponse, User } from '@supabase/supabase-js'
-import {
-  Context,
-  ContextType,
-  Validator,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { User } from '@supabase/supabase-js'
+import { createContext, useEffect, useState } from 'react'
 
-import Message from '@/components/Elements/Message'
-import { fetchUserRoles } from '@/services/users'
 import { handleAuthType } from '@/types/auth'
 import { useRouter } from 'next/router'
-import { useSessionContext } from '@supabase/auth-helpers-react'
-import { userRolesType } from '@/types/user_roles'
+import {
+  useSessionContext,
+  useSupabaseClient,
+} from '@supabase/auth-helpers-react'
+import { theme } from '@/global/theme'
+import { ThemeProvider } from '@emotion/react'
+import { debounce } from '@/helpers/debounce'
+import { changeTheme, fetchSettings } from '@/services/settings'
 
 type UserContextType = {
   user?: User | null
+  themeType: 'light' | 'dark'
   signOut: () => void
   handleAuth: handleAuthType
   snackbarMessage: string
   setSnackbarMessage: (message: string) => void
+  toggleTheme: () => void
 }
 
 export const UserContext = createContext<UserContextType>({
   user: undefined,
+  themeType: 'light',
   signOut: () => {},
   handleAuth: async () => ({
     data: {
@@ -36,6 +35,7 @@ export const UserContext = createContext<UserContextType>({
   }),
   snackbarMessage: '',
   setSnackbarMessage: () => {},
+  toggleTheme: () => {},
 })
 
 interface Props {
@@ -44,13 +44,22 @@ interface Props {
 
 const UserProvider = ({ children }: Props) => {
   const { supabaseClient } = useSessionContext()
+  const SupabaseQueries = useSupabaseClient()
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [user, setUser] = useState<User | null>(null)
+  const [themeType, setThemeType] = useState<'light' | 'dark'>('light')
   const router = useRouter()
 
   useEffect(() => {
     supabaseClient.auth.getUser().then((res) => setUser(res.data.user))
   }, [])
+
+  const toggleTheme = async () => {
+    setThemeType((prev) => (prev === 'light' ? 'dark' : 'light'))
+    if (user?.id) {
+      changeTheme(user?.id, themeType, SupabaseQueries)
+    }
+  }
 
   const handleAuth = async (
     email: string,
@@ -91,6 +100,15 @@ const UserProvider = ({ children }: Props) => {
     }
   }
 
+  useEffect(() => {
+    if (user?.id) {
+      fetchSettings(user.id, SupabaseQueries).then((data) => {
+        console.log(data)
+        setThemeType(data?.user_settings.theme)
+      })
+    }
+  }, [user])
+
   return (
     <UserContext.Provider
       value={{
@@ -99,9 +117,11 @@ const UserProvider = ({ children }: Props) => {
         signOut,
         snackbarMessage,
         setSnackbarMessage,
+        themeType,
+        toggleTheme,
       }}
     >
-      {children}
+      <ThemeProvider theme={theme[themeType]}>{children}</ThemeProvider>
     </UserContext.Provider>
   )
 }

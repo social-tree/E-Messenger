@@ -1,7 +1,9 @@
 import styled from '@emotion/styled'
 
-export const DateOfCreation = styled.p`
-  font-size: 12px;
+export const DateOfCreation = styled.p<{ myMessage: boolean }>`
+  font-size: 10px;
+  text-align: ${({ theme, myMessage }) => (myMessage ? `end` : `start`)};
+  color: ${({ theme }) => theme.darkGrey};
 `
 
 export const MessageText = styled.p<{ myMessage: boolean }>`
@@ -31,8 +33,17 @@ export const ProfileImage = styled.div`
   overflow: hidden;
 `
 
-export const Container = styled.div<{ myMessage: boolean }>`
+export const Container = styled.div<{
+  myMessage: boolean
+  orderType: string
+}>`
   display: flex;
+  position: relative;
+  left: ${({ orderType, myMessage }) =>
+    (orderType === 'end' || orderType === 'first') && !myMessage
+      ? '10px;'
+      : !myMessage && '70px;'};
+  right: ${({ myMessage }) => myMessage && '70px;'};
   align-items: flex-end;
   flex-direction: ${({ myMessage }) => (myMessage ? 'row-reverse' : 'row')};
   gap: 20px;

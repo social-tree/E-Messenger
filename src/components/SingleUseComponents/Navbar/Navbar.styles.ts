@@ -61,4 +61,5 @@ export const Container = styled.nav<{ openSettings: boolean }>`
   padding: 0px 24px;
   display: flex;
   align-items: center;
+  background-color: ${({ theme }) => theme.lightBg};
 `

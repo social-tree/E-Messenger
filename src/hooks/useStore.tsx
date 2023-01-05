@@ -86,7 +86,7 @@ export const useStore = (props: { channelId: any }) => {
       fetchMessages(
         props.channelId,
         (messages: any[]) => {
-          messages.forEach((x) => users.set(x.user_id, x.author))
+          messages?.forEach((x) => users?.set(x.user_id, x.author))
           setMessages(messages)
         },
         supabaseClient
@@ -145,7 +145,7 @@ export const useStore = (props: { channelId: any }) => {
 
   return {
     // We can export computed values here to map the authors to each message
-    messages: messages.map((x) => ({ ...x, author: users.get(x.user_id) })),
+    messages: messages?.map((x) => ({ ...x, author: users?.get(x.user_id) })),
     channels:
       channels !== null
         ? channels.sort((a, b) => a.slug.localeCompare(b.slug))

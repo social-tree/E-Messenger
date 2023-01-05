@@ -4,6 +4,7 @@ import { SupabaseClient, useSessionContext } from '@supabase/auth-helpers-react'
  * Insert a new channel into the DB
  * @param {string} slug The channel name
  * @param {number} user_id The channel creator
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
 export const addChannel = async (
   slug: string,
@@ -24,7 +25,9 @@ export const addChannel = async (
 /**
  * Delete a channel from the DB
  * @param {number} channel_id
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
+
 export const deleteChannel = async (
   channel_id: string,
   supabaseClient: SupabaseClient
@@ -43,7 +46,9 @@ export const deleteChannel = async (
 /**
  * Fetch all channels
  * @param {function} setState Optionally pass in a hook or callback to set the state
+ * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
  */
+
 export const fetchChannels = async (
   setState: Function,
   id: string,

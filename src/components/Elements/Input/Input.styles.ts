@@ -10,6 +10,7 @@ export const StyledTextField = styled(TextField)`
   min-width: 280px;
   height: 50px;
   .MuiInputBase-root {
+    color: ${({ theme }) => theme.text};
     min-width: 280px;
     height: 45px;
     border-radius: 8px;
@@ -18,7 +19,7 @@ export const StyledTextField = styled(TextField)`
     padding: 10px 14px !important;
     ::placeholder {
       font-size: 14px;
-      color: #000000;
+      color: ${({ theme }) => theme.text};
       opacity: 0.6;
     }
   }
