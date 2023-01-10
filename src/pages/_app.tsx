@@ -6,13 +6,19 @@ import { CssBaseline } from '@mui/material'
 import { Global } from '@emotion/react'
 import { GlobalStyle } from '@/global/GlobalStyle'
 import Layout from '@/Layouts/Layout'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import {
+  SessionContextProvider,
+  useSupabaseClient,
+} from '@supabase/auth-helpers-react'
 import { UserContext } from '@/context/UserContext'
 import UserProvider from '@/context/UserContext'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import createEmotionCache from '@/lib/createEmotionCache'
 import { useRouter } from 'next/router'
+import dayjs from 'dayjs'
+import { UpdateUserLastOnline } from '@/services/users'
 
+dayjs.locale()
 const clientSideEmotionCache = createEmotionCache()
 
 interface MyAppProps extends AppProps {
@@ -26,7 +32,8 @@ const App: React.FC<MyAppProps> = ({
 }) => {
   const router = useRouter()
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
-  const { themeType } = useContext(UserContext)
+  const { themeType, user } = useContext(UserContext)
+  const supabaseQuery = useSupabaseClient()
 
   useEffect(() => {
     const {

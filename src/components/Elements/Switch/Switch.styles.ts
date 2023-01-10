@@ -23,7 +23,9 @@ export const StyledSwitch = styled(Switch)`
   }
 `
 
-export const Label = styled.div``
+export const Label = styled.label`
+  transition: 300ms ease;
+`
 
 export const Error = styled.p``
 
@@ -32,4 +34,11 @@ export const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 80px;
+
+  &:hover {
+    cursor: pointer;
+    label {
+      opacity: 0.5;
+    }
+  }
 `

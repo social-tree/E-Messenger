@@ -11,9 +11,10 @@ import { theme } from '@/global/theme'
 import { ThemeProvider } from '@emotion/react'
 import { debounce } from '@/helpers/debounce'
 import { changeTheme, fetchSettings } from '@/services/settings'
+import { UserType } from '@/types/users'
 
 type UserContextType = {
-  user?: User | null
+  user?: UserType | null
   themeType: 'light' | 'dark'
   signOut: () => void
   handleAuth: handleAuthType
@@ -46,12 +47,18 @@ const UserProvider = ({ children }: Props) => {
   const { supabaseClient } = useSessionContext()
   const SupabaseQueries = useSupabaseClient()
   const [snackbarMessage, setSnackbarMessage] = useState('')
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<UserType | null>(null)
   const [themeType, setThemeType] = useState<'light' | 'dark'>('light')
   const router = useRouter()
 
   useEffect(() => {
-    supabaseClient.auth.getUser().then((res) => setUser(res.data.user))
+    supabaseClient.auth.getUser().then(async (res) => {
+      const { data } = await SupabaseQueries.from('users')
+        .select('*')
+        .eq('id', res.data.user?.id)
+        .single()
+      setUser({ ...res.data.user, ...data })
+    })
   }, [])
 
   const toggleTheme = async () => {
