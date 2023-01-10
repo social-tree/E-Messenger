@@ -42,7 +42,7 @@ export const Switch = ({
                 onChange(event, value)
                 onValueChange && onValueChange(event, value)
               }}
-              inputProps={{ id: `${name}` }}
+              inputProps={{ id: `switch-${name}` }}
               onBlur={onBlur}
               checked={value}
             />
