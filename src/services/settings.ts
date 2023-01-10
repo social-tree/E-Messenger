@@ -3,8 +3,8 @@ import { SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * Fetch Settings
- * @param {number} userId
- * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
+ * @param userId the id of the user to fetch the settings from
+ * @param supabaseClient client from useSupabaseClient to make queries
  */
 
 export const fetchSettings = async (
@@ -26,9 +26,9 @@ export const fetchSettings = async (
 
 /**
  * Change Theme
- * @param {number} userId
- * @param {theme} theme the current Theme
- * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
+ * @param userId the id of the user to change the theme for
+ * @param theme the current Theme
+ * @param supabaseClient client from useSupabaseClient to make queries
  */
 
 export const changeTheme = async (

@@ -3,9 +3,9 @@ import dayjs from 'dayjs'
 
 /**
  * Fetch a single user
- * @param {number} userId
- * @param {function} setState Optionally pass in a hook or callback to set the state
- * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
+ * @param userId the id of the user to fetch
+ * @param setState Optionally pass in a hook or callback to set the state
+ * @param supabaseClient client from useSupabaseClient to make queries
  */
 
 export const fetchUser = async (
@@ -31,8 +31,8 @@ export const fetchUser = async (
 
 /**
  * Fetch all roles for the current user
- * @param {function} setState Optionally pass in a hook or callback to set the state
- * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
+ * @param setState Optionally pass in a hook or callback to set the state
+ * @param supabaseClient client from useSupabaseClient to make queries
  */
 
 export const fetchUserRoles = async (
@@ -50,8 +50,8 @@ export const fetchUserRoles = async (
 
 /**
  * Update users last activity date
- * @param {number} userId id of the user that you want to update
- * @param {SupabaseClient} supabaseClient client from useSupabaseClient to make queries
+ * @param userId id of the user that you want to update
+ * @param supabaseClient client from useSupabaseClient to make queries
  */
 
 export const UpdateUserLastOnline = async (

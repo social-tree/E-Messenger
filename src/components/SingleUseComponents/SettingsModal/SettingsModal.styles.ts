@@ -1,4 +1,3 @@
-
 import { Popover } from '@mui/material'
 
 import styled from '@emotion/styled'
@@ -13,7 +12,7 @@ export const StyledButton = styled(Button)`
   padding: 0px;
   padding-right: 8px;
   transition: 400ms ease;
-
+  
   &:hover {
     opacity: 0.5;
     background-color: transparent;

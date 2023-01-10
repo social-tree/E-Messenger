@@ -24,7 +24,7 @@ export const addChannel = async (
 
 /**
  * Delete a channel from the DB
- * @param channel_id
+ * @param channel_id the id of the channel to delete
  * @param supabaseClient client from useSupabaseClient to make queries
  */
 
@@ -44,14 +44,15 @@ export const deleteChannel = async (
 }
 
 /**
- * Fetch all channels
+ * Fetch all channels of a user
  * @param setState Optionally pass in a hook or callback to set the state
+ * @param userId the id of the user to fetch the channels that belong to the user
  * @param supabaseClient client from useSupabaseClient to make queries
  */
 
 export const fetchChannels = async (
   setState: Function,
-  id: string,
+  userId: string,
   supabaseClient: SupabaseClient
 ) => {
   try {
@@ -60,7 +61,7 @@ export const fetchChannels = async (
       .select(
         `*, to_user:users!channels_to_user_fkey(*),created_by:users!channels_created_by_fkey(*),messages:messages!id(*)`
       )
-      .or(`created_by.eq.${id},to_user.eq.${id}`)
+      .or(`created_by.eq.${userId},to_user.eq.${userId}`)
       .order('inserted_at', { ascending: false, foreignTable: 'messages' })
       .limit(1, { foreignTable: 'messages' })
 
