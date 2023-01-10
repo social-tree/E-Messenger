@@ -10,6 +10,8 @@ import { useRouter } from 'next/router'
 import { useStore } from '@/hooks/useStore'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { channel } from 'diagnostics_channel'
+import dayjs from 'dayjs'
+import { UpdateUserLastOnline } from '@/services/users'
 
 const ChannelsPage = () => {
   const router = useRouter()
@@ -36,6 +38,15 @@ const ChannelsPage = () => {
   }, [channels, channelId]) */
 
   // Render the channels and messages
+
+  useEffect(() => {
+    const Update = async () => {
+      if (!user?.id) return
+      await UpdateUserLastOnline(user?.id, supabaseClient)
+    }
+    Update()
+  }, [user])
+
   return (
     <UserLayout
       user={user}

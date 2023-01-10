@@ -1,11 +1,15 @@
-import { Container, StyledPopover } from './SettingsModal.styles'
+import {
+  ChangePhoto,
+  Container,
+  StyledButton,
+  StyledPopover,
+} from './SettingsModal.styles'
 
-import React, { useContext, useEffect } from 'react'
-import { Typography } from '@mui/material'
-import { Switch } from '@/components/Elements/Switch'
-import { useController, useForm, useWatch } from 'react-hook-form'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useContext, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { UserContext } from '@/context/UserContext'
+import { Switch } from '@/components/Elements/Switch'
+import LogoutSVG from '@/assets/icons/logout.svg'
 
 interface Props {
   open: Element | null
@@ -13,7 +17,7 @@ interface Props {
 }
 
 const SettingsModal = ({ open, onClose }: Props) => {
-  const { toggleTheme, themeType } = useContext(UserContext)
+  const { toggleTheme, themeType, signOut } = useContext(UserContext)
   const {
     control,
     register,
@@ -36,13 +40,14 @@ const SettingsModal = ({ open, onClose }: Props) => {
     <StyledPopover
       anchorOrigin={{
         vertical: 'bottom',
-        horizontal: 'center',
+        horizontal: 'right',
       }}
       open={!!open}
       anchorEl={open}
       onClose={onClose}
     >
       <Container>
+        <StyledButton>Change Avatar</StyledButton>
         <Switch
           label={'Dark Mode'}
           errors={errors}
@@ -50,6 +55,9 @@ const SettingsModal = ({ open, onClose }: Props) => {
           onValueChange={() => handleThemeSubmit()}
           {...register('theme', { required: true })}
         />
+        <StyledButton onClick={() => signOut()}>
+          Logout <LogoutSVG width={20} />
+        </StyledButton>
       </Container>
     </StyledPopover>
   )

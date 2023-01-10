@@ -30,7 +30,7 @@ export const Switch = ({
 }: Props) => {
   return (
     <Container className={className}>
-      <Label>{label}</Label>
+      <Label htmlFor={`switch-${name}`}>{label}</Label>
       <FormControl {...props}>
         <Controller
           name={name}
@@ -42,6 +42,7 @@ export const Switch = ({
                 onChange(event, value)
                 onValueChange && onValueChange(event, value)
               }}
+              inputProps={{ id: `switch-${name}` }}
               onBlur={onBlur}
               checked={value}
             />
