@@ -1,3 +1,9 @@
+/**
+ * format the date to what you need
+ * @param date the date to format
+ * @param type the type of formating thats needed
+ */
+
 export const FormatDate = (date: string, type: string) => {
   switch (type) {
     case 'hour':
@@ -6,7 +12,6 @@ export const FormatDate = (date: string, type: string) => {
       return `${hour}:${minutes < 10 ? `0${minutes}` : minutes}
       ${hour > 12 ? 'PM' : 'AM'}
       `
-      break
     default:
       return `${new Date(date)}`
   }

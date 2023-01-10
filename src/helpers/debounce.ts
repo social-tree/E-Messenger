@@ -1,7 +1,7 @@
 /**
  * Debounce functions for a specific duration
- * func the function that you want to debounce
- * wait the duration to wait before running the function
+ * @param func the function that you want to debounce
+ * @param wait the duration to wait before running the function
  */
 
 export function debounce<F extends (...args: any[]) => any>(
