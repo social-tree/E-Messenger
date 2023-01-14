@@ -63,7 +63,6 @@ export const UpdateUserLastOnline = async (
       .from('users')
       .update({ last_online: dayjs().toISOString() })
       .eq('id', userId)
-    console.log(data)
     return data
   } catch (error) {
     console.log('error', error)

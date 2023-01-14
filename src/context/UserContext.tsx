@@ -68,11 +68,21 @@ const UserProvider = ({ children }: Props) => {
     }
   }
 
-  const handleAuth = async (
-    email: string,
-    password: string,
-    confirmPassword?: string
+  const handleAuth: handleAuthType = async (
+    email,
+    password,
+    confirmPassword,
+    username
   ) => {
+    console.log({
+      email,
+      password,
+      options: {
+        data: {
+          username: username,
+        },
+      },
+    })
     if (confirmPassword) {
       if (confirmPassword !== password)
         return {
@@ -84,11 +94,18 @@ const UserProvider = ({ children }: Props) => {
         .signUp({
           email,
           password,
+          options: {
+            data: {
+              username: username,
+            },
+          },
         })
         .then((response) => {
-          setSnackbarMessage(
-            'Your account has been created. Please check your email to confirm your account.'
-          )
+          console.log(response)
+          response.data.user &&
+            setSnackbarMessage(
+              'Your account has been created. Please check your email to confirm your account.'
+            )
 
           return response
         })
@@ -110,7 +127,6 @@ const UserProvider = ({ children }: Props) => {
   useEffect(() => {
     if (user?.id) {
       fetchSettings(user.id, SupabaseQueries).then((data) => {
-        console.log(data)
         setThemeType(data?.user_settings.theme)
       })
     }

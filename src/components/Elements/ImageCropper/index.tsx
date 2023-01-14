@@ -1,25 +1,31 @@
+import { UserContext } from '@/context/UserContext'
 import getCroppedImg from '@/helpers/copImage'
 import { Slider } from '@mui/material'
-import React, { useCallback, useState } from 'react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { decode } from 'base64-arraybuffer'
+import React, { useCallback, useContext, useState } from 'react'
 import {
   BackgroundShadow,
   Container,
   StyledButton,
   StyledCropper,
+  StyledSlider,
   Wrap,
 } from './ImageCropper.styles'
 
 interface Props {
   image?: string
-  open: boolean
   toggleCropper: () => void
+  afterCrop: (uploadedImage: string) => void
 }
 
 export const ImageCropper: React.FC<Props> = ({
   image,
-  open,
   toggleCropper,
+  afterCrop,
 }) => {
+  const { user } = useContext(UserContext)
+  const supaBaseQuery = useSupabaseClient()
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
@@ -29,7 +35,7 @@ export const ImageCropper: React.FC<Props> = ({
     width: 0,
     height: 0,
   })
-  const [croppedImage, setCroppedImage] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const onCropComplete = useCallback(
     (
@@ -44,19 +50,29 @@ export const ImageCropper: React.FC<Props> = ({
   const showCroppedImage = useCallback(async () => {
     if (!croppedAreaPixels) return
     try {
-      const croppedImage = await getCroppedImg(
+      const croppedImage = (await getCroppedImg(
         image,
         croppedAreaPixels,
         rotation
-      )
-      console.log('donee', { croppedImage })
+      )) as Blob
+      setLoading(true)
+      const { data } = await supaBaseQuery.storage
+        .from('avatars')
+        .upload(`${user?.id}/${user?.id}.png`, croppedImage, {
+          contentType: 'image/png',
+          upsert: true,
+        })
+
+      setLoading(false)
+      if (data) afterCrop(data?.path)
+      toggleCropper()
     } catch (e) {
       console.error(e)
     }
   }, [croppedAreaPixels, rotation])
 
   return (
-    <Container open={open}>
+    <Container>
       <BackgroundShadow onClick={() => toggleCropper()} />
       <Wrap>
         <StyledCropper
@@ -65,6 +81,7 @@ export const ImageCropper: React.FC<Props> = ({
           zoom={zoom}
           rotation={rotation}
           aspect={1}
+          maxZoom={100}
           onCropChange={setCrop}
           onCropComplete={onCropComplete}
           onZoomChange={setZoom}
@@ -77,13 +94,15 @@ export const ImageCropper: React.FC<Props> = ({
           onChange={(e, value) => value >= 1 && setZoom(Number(value))}
         />
         Rotation: {rotation}°
-        <Slider
+        <StyledSlider
           aria-label="Volume"
           value={rotation}
           max={360}
           onChange={(e, value) => setRotation(Number(value))}
         />
-        <StyledButton onClick={() => showCroppedImage()}>Save</StyledButton>
+        <StyledButton loading={loading} onClick={() => showCroppedImage()}>
+          Save
+        </StyledButton>
       </Wrap>
     </Container>
   )

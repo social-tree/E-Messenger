@@ -31,13 +31,15 @@ export function rotateSize(width: number, height: number, rotation: number) {
  * @param pixelCrop the new size in pixels to crop to
  * @param rotation the rotation angle in degrees to crop to
  * @param flip to flip the image horizontally or vertically
+ * @param base64 to base64 encode the image
  */
 
 export default async function getCroppedImg(
   imageSrc: any,
   pixelCrop: { x: number; y: number; width: number; height: number },
   rotation = 0,
-  flip = { horizontal: false, vertical: false }
+  flip = { horizontal: false, vertical: false },
+  base64 = false
 ) {
   const image = (await createImage(imageSrc)) as CanvasImageSource
   const canvas = document.createElement('canvas')
@@ -89,10 +91,7 @@ export default async function getCroppedImg(
   // return canvas.toDataURL('image/jpeg');
 
   // As a blob
-  console.log(canvas)
   return new Promise((resolve, reject) => {
-    canvas.toBlob((file) => {
-      return resolve(URL.createObjectURL(file as Blob))
-    }, 'image/jpeg')
+    canvas.toBlob((file) => resolve(file))
   })
 }

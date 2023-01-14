@@ -44,7 +44,10 @@ const ChannelsPage = () => {
       if (!user?.id) return
       await UpdateUserLastOnline(user?.id, supabaseClient)
     }
-    Update()
+    window.addEventListener('beforeunload', Update)
+    return () => {
+      window.removeEventListener('beforeunload', Update)
+    }
   }, [user])
 
   return (

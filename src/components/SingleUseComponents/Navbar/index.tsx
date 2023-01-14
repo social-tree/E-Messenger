@@ -12,13 +12,13 @@ import {
   UserInfo,
   Username,
 } from './Navbar.styles'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import SettingsModal from '../SettingsModal'
 import { UserContext } from '@/context/UserContext'
 import { ImageCropper } from '@/components/Elements/ImageCropper'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 interface Props {
   username?: string
@@ -26,10 +26,11 @@ interface Props {
 }
 
 const Navbar = ({ username, time }: Props) => {
+  const supabaseClient = useSupabaseClient()
   const [openSettings, setOpenSettings] = useState<Element | null>(null)
-  const [profileImage, setProfileImage] = useState<File | null>(null)
-  const [previewProfile, setPreviewProfile] = useState<string | undefined>(
-    undefined
+  const [previewProfile, setPreviewProfile] = useState<string>('')
+  const [profileImage, setProfileImage] = useState(
+    'https://i.ibb.co/mFg8pLH/c0c216b3743c6cb9fd67ab7df6b2c330.jpg'
   )
 
   const { user } = useContext(UserContext)
@@ -42,8 +43,7 @@ const Navbar = ({ username, time }: Props) => {
   }
 
   const handleProfileImage = (file?: File) => {
-    if (!file) return
-    setProfileImage(file)
+    if (!file) return setPreviewProfile('')
 
     const reader = new FileReader()
     reader.onloadend = () => {
@@ -52,6 +52,29 @@ const Navbar = ({ username, time }: Props) => {
     }
     reader.readAsDataURL(file)
   }
+
+  const ProfileImageChange = async (uploadedImage: string) => {
+    const { data } = supabaseClient.storage
+      .from('avatars')
+      .getPublicUrl(`${user?.id}/${user?.id}.png`)
+    if (data.publicUrl) {
+      await supabaseClient
+        .from('users')
+        .update({ avatar: data.publicUrl })
+        .eq('id', user?.id)
+      console.log(data.publicUrl)
+      setProfileImage(`${data.publicUrl}?${new Date()}`)
+    }
+  }
+
+  useEffect(() => {
+    if (user?.avatar) {
+      console.log(user)
+      setProfileImage(`${user.avatar}&${new Date()}`)
+    }
+  }, [user?.avatar])
+
+  console.log(profileImage)
 
   return (
     <Container openSettings={!!openSettings}>
@@ -69,26 +92,31 @@ const Navbar = ({ username, time }: Props) => {
       <ProfileInfo>
         {user && (
           <>
-            <ImageCropper
-              open={profileImage ? true : false}
-              toggleCropper={handleProfileImage}
-              image={previewProfile}
-            />
+            {previewProfile && (
+              <ImageCropper
+                afterCrop={ProfileImageChange}
+                toggleCropper={handleProfileImage}
+                image={previewProfile}
+              />
+            )}
             <SettingsIcon onClick={(e: any) => handleOpenSettings(e)} />
             <SettingsModal open={openSettings} onClose={closeSettings} />
             <Upload
               onChange={(event) => {
                 console.log('W')
                 handleProfileImage(event?.target?.files?.[0])
+                return (event.currentTarget.value = '')
               }}
               id="profileImage"
               type={'file'}
             />
             <ProfileImageContainer htmlFor="profileImage">
               <StyledImage
-                src="https://i.pinimg.com/originals/c0/c2/16/c0c216b3743c6cb9fd67ab7df6b2c330.jpg"
+                src={`${profileImage}?${new Date()}`}
                 width={52}
                 height={52}
+                unoptimized={true}
+                key={42343}
                 alt="profile"
               />
               <StyledCameraSVG />
