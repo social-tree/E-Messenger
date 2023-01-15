@@ -32,12 +32,13 @@ const Home = () => {
   }
 
   const AuthSumbit = async (data: any) => {
-    const { email, password, confirmPassword } = data
+    const { email, password, confirmPassword, username } = data
     try {
       const { error } = await handleAuth(
         email,
         password,
-        confirmPassword && confirmPassword
+        confirmPassword && confirmPassword,
+        username
       )
 
       error?.message &&
@@ -55,6 +56,18 @@ const Home = () => {
       <ForgotPassModal onClose={handleClose} open={showForgetPassword} />
       <Wrap onSubmit={handleSubmit(AuthSumbit)}>
         <Inputs>
+          {authMode !== 'login' && (
+            <Input
+              label={'Username'}
+              placeholder="Username"
+              inputProps={{ placeholder: 'Volxen' }}
+              {...register('username', {
+                required: 'Please enter your Username',
+              })}
+              control={control}
+              errors={errors}
+            />
+          )}
           <Input
             label={'Email'}
             {...register('email', { required: 'Please enter your email' })}
@@ -145,6 +158,7 @@ const Home = () => {
             textAlign: 'center',
             fontSize: 14,
             fontWeight: '600',
+            fontFamily: 'inherit',
           }}
         >
           {authMode === 'login'
@@ -227,6 +241,7 @@ export const SocialButtons = styled.div`
 export const SignIn = styled(Button)`
   width: 100%;
   font-weight: 800;
+  color: white;
   height: 45px;
   letter-spacing: 1px;
   box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.15);

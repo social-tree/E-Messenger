@@ -21,7 +21,7 @@ export const GlobalStyle = css`
   }
   html,
   body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: Plus Jakarta Sans, sans-serif;
     width: 100%;
     height: 100%;
   }

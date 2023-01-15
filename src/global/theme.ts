@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material'
 export const theme: { light: ThemeType; dark: ThemeType } = {
   light: createTheme({
     bg: '#FFFFFF',
-    lightBg: '',
+    lightBg: '#FFFFFF',
     blue: '#2595FF',
     darkBlue: '#4f81a3',
     grey: '#CDD5DE',

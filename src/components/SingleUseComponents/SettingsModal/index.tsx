@@ -47,7 +47,6 @@ const SettingsModal = ({ open, onClose }: Props) => {
       onClose={onClose}
     >
       <Container>
-        <StyledButton>Change Avatar</StyledButton>
         <Switch
           label={'Dark Mode'}
           errors={errors}
