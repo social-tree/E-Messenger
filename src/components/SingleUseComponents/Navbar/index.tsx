@@ -19,6 +19,7 @@ import SettingsModal from '../SettingsModal'
 import { UserContext } from '@/context/UserContext'
 import { ImageCropper } from '@/components/Elements/ImageCropper'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { imageUpdater } from '@/helpers/imageUpdater'
 
 interface Props {
   username?: string
@@ -63,14 +64,13 @@ const Navbar = ({ username, time }: Props) => {
         .update({ avatar: data.publicUrl })
         .eq('id', user?.id)
       console.log(data.publicUrl)
-      setProfileImage(`${data.publicUrl}?${new Date()}`)
+      setProfileImage(imageUpdater(data.publicUrl))
     }
   }
 
   useEffect(() => {
     if (user?.avatar) {
-      console.log(user)
-      setProfileImage(`${user.avatar}&${new Date()}`)
+      setProfileImage(user.avatar)
     }
   }, [user?.avatar])
 
@@ -83,10 +83,10 @@ const Navbar = ({ username, time }: Props) => {
       </Link>
       <UserInfo>
         {username && <Username>{username}</Username>}
-        {username && time ? (
+        {username && time !== 'ONLINE' ? (
           <Lastseen>last seen {time} ago</Lastseen>
         ) : (
-          username && <Lastseen>online</Lastseen>
+          username && <Lastseen>is online</Lastseen>
         )}
       </UserInfo>
       <ProfileInfo>
@@ -112,7 +112,7 @@ const Navbar = ({ username, time }: Props) => {
             />
             <ProfileImageContainer htmlFor="profileImage">
               <StyledImage
-                src={`${profileImage}?${new Date()}`}
+                src={`${profileImage}`}
                 width={52}
                 height={52}
                 unoptimized={true}

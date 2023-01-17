@@ -16,7 +16,7 @@ import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import createEmotionCache from '@/lib/createEmotionCache'
 import { useRouter } from 'next/router'
 import dayjs from 'dayjs'
-import { UpdateUserLastOnline } from '@/services/users'
+import { UpdateUserLastOnline, UpdateUserStatus } from '@/services/users'
 
 dayjs.locale()
 const clientSideEmotionCache = createEmotionCache()
@@ -30,22 +30,7 @@ const App: React.FC<MyAppProps> = ({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }) => {
-  const router = useRouter()
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
-  const { themeType, user } = useContext(UserContext)
-  const supabaseQuery = useSupabaseClient()
-
-  useEffect(() => {
-    const {
-      data: { subscription: authListener },
-    } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY') router.push('/forgot-password')
-      if (event === 'SIGNED_IN') router.push('/channels/1')
-    })
-    return () => {
-      authListener.unsubscribe()
-    }
-  }, [])
 
   return (
     <CacheProvider value={emotionCache}>

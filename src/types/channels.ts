@@ -5,8 +5,8 @@ export type ChannelType = {
   id: number
   inserted_at: string
   created_by: UserType
-  messages: MessagesType
-  slug: string
+  messages?: MessagesType
+  slug?: string
   to_user: UserType
 }
 

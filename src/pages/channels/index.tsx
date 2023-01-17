@@ -12,24 +12,15 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { channel } from 'diagnostics_channel'
 import dayjs from 'dayjs'
 import { UpdateUserLastOnline } from '@/services/users'
-import { Loading } from '@/components/Elements/Loading'
 
 const ChannelsPage = () => {
   const router = useRouter()
   const { user } = useContext(UserContext)
-  const messagesEndRef = useRef<null | HTMLDivElement>(null)
   const supabaseClient = useSupabaseClient()
 
   // Else load up the page
   const { id: channelId } = router.query
-  const { messages, channels, loading } = useStore({ channelId })
-
-  useEffect(() => {
-    messagesEndRef?.current?.scrollIntoView({
-      block: 'start',
-      behavior: 'smooth',
-    })
-  }, [messages])
+  const { channels } = useStore({ channelId })
 
   // redirect to public channel when current channel is deleted
   /* useEffect(() => {
@@ -38,45 +29,26 @@ const ChannelsPage = () => {
     }
   }, [channels, channelId]) */
 
-  if (loading) {
-    return <Loading />
-  }
-
   // Render the channels and messages
+
+  useEffect(() => {
+    const Update = async () => {
+      if (!user?.id) return
+      await UpdateUserLastOnline(user?.id, supabaseClient)
+    }
+    window.addEventListener('beforeunload', Update)
+    return () => {
+      window.removeEventListener('beforeunload', Update)
+    }
+  }, [user])
+
   return (
     <UserLayout
       user={user}
       channels={channels}
       activeChannelId={channelId as string}
     >
-      <Container>
-        <Messages>
-          {messages?.map((x, index) => {
-            const orderType =
-              messages[index - 1]?.author?.id !== x.author.id &&
-              messages[index + 1]?.author?.id !== x.author.id
-                ? 'first'
-                : messages[index - 1]?.author?.id !== x.author.id
-                ? 'start'
-                : messages[index + 1]?.author?.id === x.author.id
-                ? 'middle'
-                : messages[index - 1]?.author?.id === x.author.id &&
-                  messages[index + 1]?.author?.id !== x.author.id
-                ? 'end'
-                : 'other'
-            return (
-              <Message orderType={orderType} key={`${x?.id}`} message={x} />
-            )
-          })}
-          <div ref={messagesEndRef} style={{ height: 0 }} />
-        </Messages>
-        <MessageInput
-          onSubmit={async (message: string) =>
-            user &&
-            addMessage(message, channelId as string, user.id, supabaseClient)
-          }
-        />
-      </Container>
+      <Container>Please select a contact to message</Container>
     </UserLayout>
   )
 }
@@ -98,6 +70,8 @@ const Container = styled.div`
   padding: 0px 80px 20px 80px;
   max-height: calc(100vh - 56px);
   display: flex;
+  align-items: center;
+  justify-content: center;
   height: 100%;
   flex-direction: column;
 `

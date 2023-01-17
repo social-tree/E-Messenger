@@ -1,4 +1,15 @@
+import { Input } from '@/components/Elements/Input'
 import styled from '@emotion/styled'
+
+export const SearchTitle = styled.span`
+  font-size: 14px;
+  padding-left: 20px;
+`
+
+export const StyledInput = styled(Input)`
+  max-width: 276px;
+  align-self: center;
+`
 
 export const List = styled.ul`
   display: flex;
@@ -10,6 +21,8 @@ export const Container = styled.div`
   padding: 10px 0px;
   min-width: 320px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background-color: ${({ theme }) => theme.lightBg};
   border-right: 1px solid
     ${({ theme }) => (theme.lightBg ? theme.lightBg : '#cdd5de')};

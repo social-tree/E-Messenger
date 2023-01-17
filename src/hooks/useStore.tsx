@@ -26,20 +26,29 @@ export const useStore = (props: { channelId: any }) => {
   const [deletedMessage, handleDeletedMessage] = useState<MessageType | null>(
     null
   )
+  const [loading, setLoading] = useState(true)
 
   const supabaseClient = useSupabaseClient()
-
   // Load initial data and set up listeners
   useEffect(() => {
     // Get Channels
-    user?.id && fetchChannels(setChannels, user.id, supabaseClient)
+    const getChannels = async () => {
+      if (user?.id) {
+        setLoading(true)
+        await fetchChannels(setChannels, user.id, supabaseClient)
+        setLoading(false)
+      }
+    }
+    getChannels()
     // Listen for new and deleted messages
     const messageListener = supabaseClient
       .channel('public:messages')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => handleNewMessage(payload.new as MessageType)
+        (payload) => {
+          handleNewMessage(payload.new as MessageType)
+        }
       )
       .on(
         'postgres_changes',
@@ -65,12 +74,6 @@ export const useStore = (props: { channelId: any }) => {
         { event: 'INSERT', schema: 'public', table: 'channels' },
         (payload) => /* handleNewChannel(payload.new) */ console.log(payload)
       )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'channels' },
-        (payload) =>
-          /* handleDeletedChannel(payload.old) */ console.log(payload)
-      )
       .subscribe()
     // Cleanup on unmount
     return () => {
@@ -82,16 +85,21 @@ export const useStore = (props: { channelId: any }) => {
 
   // Update when the route changes
   useEffect(() => {
-    if (props?.channelId > 0) {
-      fetchMessages(
-        props.channelId,
-        (messages: any[]) => {
-          messages?.forEach((x) => users?.set(x.user_id, x.author))
-          setMessages(messages)
-        },
-        supabaseClient
-      )
+    const onRouteChange = async () => {
+      if (props?.channelId > 0) {
+        setLoading(true)
+        await fetchMessages(
+          props.channelId,
+          (messages: any[]) => {
+            messages?.forEach((x) => users?.set(x.user_id, x.author))
+            setMessages(messages)
+          },
+          supabaseClient
+        )
+        setLoading(false)
+      }
     }
+    onRouteChange()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.channelId])
 
@@ -128,28 +136,14 @@ export const useStore = (props: { channelId: any }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newChannel])
 
-  // Deleted channel received from postgres
-  useEffect(() => {
-    if (deletedChannel)
-      setChannels(
-        channels.filter((channel) => channel.id !== deletedChannel.id)
-      )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deletedChannel])
-
-  // New or updated user received from Postgres
-  useEffect(() => {
-    if (newOrUpdatedUser) users.set(newOrUpdatedUser.id, newOrUpdatedUser)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newOrUpdatedUser])
-
   return {
     // We can export computed values here to map the authors to each message
     messages: messages?.map((x) => ({ ...x, author: users?.get(x.user_id) })),
+    lastMessage: messages[messages.length - 1],
     channels:
       channels !== null
-        ? channels.sort((a, b) => a.slug.localeCompare(b.slug))
+        ? channels.sort((a, b) => a.inserted_at.localeCompare(b.inserted_at))
         : [],
-    users,
+    loading,
   }
 }

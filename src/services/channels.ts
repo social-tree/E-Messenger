@@ -2,20 +2,21 @@ import { SupabaseClient, useSessionContext } from '@supabase/auth-helpers-react'
 
 /**
  * Insert a new channel into the DB
- * @param slug The channel name
- * @param user_id The channel creator
+ * @param to_user The channel responder
+ * @param created_by The channel creator
  * @param supabaseClient client from useSupabaseClient to make queries
  */
 export const addChannel = async (
-  slug: string,
-  user_id: string,
+  to_user: string,
+  created_by: string,
   supabaseClient: SupabaseClient
 ) => {
   try {
     let { data } = await supabaseClient
       .from('channels')
-      .insert([{ slug, created_by: user_id }])
+      .insert([{ to_user, created_by }])
       .select()
+      .single()
     return data
   } catch (error) {
     console.log('error', error)
@@ -64,7 +65,6 @@ export const fetchChannels = async (
       .or(`created_by.eq.${userId},to_user.eq.${userId}`)
       .order('inserted_at', { ascending: false, foreignTable: 'messages' })
       .limit(1, { foreignTable: 'messages' })
-
     if (setState) setState(data)
     return data
   } catch (error) {

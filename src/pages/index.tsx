@@ -224,7 +224,6 @@ export const SocialButton = styled(Button)`
   border-radius: 8px;
   width: 100%;
   height: 45px;
-
   &:hover {
     background-color: transparent;
     border: none;
@@ -258,6 +257,17 @@ export const Inputs = styled.div`
   flex-direction: column;
   gap: 10px;
   width: 100%;
+
+  .MuiInputBase-root {
+    background-color: #ffffff;
+  }
+
+  .MuiInputBase-input {
+    ::placeholder {
+      color: black;
+    }
+  }
+
   @media only screen and (max-width: 400px) {
     .MuiFormControl-root,
     .MuiInputBase-root {
