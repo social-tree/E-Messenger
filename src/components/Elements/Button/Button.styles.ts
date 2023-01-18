@@ -6,6 +6,7 @@ export const StyledButton = styled(LoadingButton)`
   background-color: ${({ theme }) => theme.blue};
   color: ${({ theme }) => theme.text};
   font-family: inherit;
+  text-transform: none;
   &:hover {
     background-color: ${({ theme }) => theme.blue};
   }

@@ -8,6 +8,8 @@ module.exports = {
         return config;
     },
     images: {
-        domains: ['i.pinimg.com', 'i.ibb.co', 'fxqraweyzgsxoqvopnge.supabase.co'],
+        domains: ['i.pinimg.com', 'i.ibb.co', 'fxqraweyzgsxoqvopnge.supabase.co', 'api.dicebear.com'],
+        dangerouslyAllowSVG: true,
+        contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     },
 };

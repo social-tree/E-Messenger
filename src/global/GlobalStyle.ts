@@ -18,10 +18,10 @@ export const GlobalStyle = css`
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+    font-family: Plus Jakarta Sans, sans-serif !important;
   }
   html,
   body {
-    font-family: Plus Jakarta Sans, sans-serif;
     width: 100%;
     height: 100%;
   }

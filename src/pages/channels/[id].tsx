@@ -12,6 +12,8 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { channel } from 'diagnostics_channel'
 import dayjs from 'dayjs'
 import { UpdateUserLastOnline } from '@/services/users'
+import { Loading } from '@/components/Elements/Loading'
+import { MessageType } from '@/types/messeges'
 
 const ChannelsPage = () => {
   const router = useRouter()
@@ -21,7 +23,15 @@ const ChannelsPage = () => {
 
   // Else load up the page
   const { id: channelId } = router.query
-  const { messages, channels } = useStore({ channelId })
+  const {
+    messages,
+    channels,
+    loading,
+    users,
+    activeChannel,
+    channelIds,
+    otherUser,
+  } = useStore(channelId ? { channelId: Number(channelId) } : { channelId: 0 })
 
   useEffect(() => {
     messagesEndRef?.current?.scrollIntoView({
@@ -30,49 +40,39 @@ const ChannelsPage = () => {
     })
   }, [messages])
 
-  // redirect to public channel when current channel is deleted
-  /* useEffect(() => {
-    if (!channels.some((channel) => channel?.id === Number(channelId))) {
-      router.push('/channels/1')
-    }
-  }, [channels, channelId]) */
-
-  // Render the channels and messages
-
-  useEffect(() => {
-    const Update = async () => {
-      if (!user?.id) return
-      await UpdateUserLastOnline(user?.id, supabaseClient)
-    }
-    window.addEventListener('beforeunload', Update)
-    return () => {
-      window.removeEventListener('beforeunload', Update)
-    }
-  }, [user])
+  if (loading) {
+    return <Loading />
+  }
 
   return (
     <UserLayout
-      user={user}
+      otherUser={otherUser}
       channels={channels}
-      activeChannelId={channelId as string}
+      channelIds={channelIds}
+      activeChannel={activeChannel}
     >
       <Container>
         <Messages>
           {messages?.map((x, index) => {
             const orderType =
-              messages[index - 1]?.author?.id !== x.author.id &&
-              messages[index + 1]?.author?.id !== x.author.id
+              messages[index - 1]?.author?.id !== x.author?.id &&
+              messages[index + 1]?.author?.id !== x.author?.id
                 ? 'first'
-                : messages[index - 1]?.author?.id !== x.author.id
+                : messages[index - 1]?.author?.id !== x.author?.id
                 ? 'start'
-                : messages[index + 1]?.author?.id === x.author.id
+                : messages[index + 1]?.author?.id === x.author?.id
                 ? 'middle'
-                : messages[index - 1]?.author?.id === x.author.id &&
-                  messages[index + 1]?.author?.id !== x.author.id
+                : messages[index - 1]?.author?.id === x.author?.id &&
+                  messages[index + 1]?.author?.id !== x.author?.id
                 ? 'end'
                 : 'other'
-
-            return <Message orderType={orderType} key={x.id} message={x} />
+            return (
+              <Message
+                orderType={orderType}
+                key={`${x?.id}`}
+                message={x as MessageType}
+              />
+            )
           })}
           <div ref={messagesEndRef} style={{ height: 0 }} />
         </Messages>

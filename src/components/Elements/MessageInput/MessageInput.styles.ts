@@ -9,13 +9,18 @@ export const StyledInput = styled(Input)`
   .MuiOutlinedInput-notchedOutline {
     border: none;
   }
-  background-color: ${({ theme }) => theme.lightBg}50;
+
+  .MuiInputBase-root {
+    background-color: 1px solid ${({ theme }) => theme.grey};
+  }
+  background-color: 1px solid ${({ theme }) => theme.grey};
+  border: 1px solid ${({ theme }) => theme.grey};
 `
 
 export const StyledButton = styled(Button)`
   margin-left: auto;
   background-color: transparent;
-  padding: 4px 0px 2px 0px;
+  padding: 4px 0px 6px 0px;
   min-width: 60px;
   color: #9e9e9e;
   display: flex;

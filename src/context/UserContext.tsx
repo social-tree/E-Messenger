@@ -12,6 +12,12 @@ import { ThemeProvider } from '@emotion/react'
 import { debounce } from '@/helpers/debounce'
 import { changeTheme, fetchSettings } from '@/services/settings'
 import { UserType } from '@/types/users'
+import {
+  fetchUser,
+  UpdateUserLastOnline,
+  UpdateUserStatus,
+} from '@/services/users'
+import { imageUpdater } from '@/helpers/imageUpdater'
 
 type UserContextType = {
   user?: UserType | null
@@ -20,7 +26,7 @@ type UserContextType = {
   handleAuth: handleAuthType
   snackbarMessage: string
   setSnackbarMessage: (message: string) => void
-  toggleTheme: () => void
+  toggleTheme: (local?: boolean) => void
 }
 
 export const UserContext = createContext<UserContextType>({
@@ -52,18 +58,59 @@ const UserProvider = ({ children }: Props) => {
   const router = useRouter()
 
   useEffect(() => {
+    const {
+      data: { subscription: authListener },
+    } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') router.push('/forgot-password')
+      if (event === 'SIGNED_IN' && router.route === '/')
+        router.push('/channels')
+      if (!session) return
+      const data = await fetchUser(session.user?.id, SupabaseQueries)
+      setUser({
+        ...session.user,
+        ...data,
+        avatar: data?.avatar ? imageUpdater(data?.avatar) : data?.avatar,
+      })
+    })
+
+    return () => {
+      authListener.unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
     supabaseClient.auth.getUser().then(async (res) => {
-      const { data } = await SupabaseQueries.from('users')
-        .select('*')
-        .eq('id', res.data.user?.id)
-        .single()
-      setUser({ ...res.data.user, ...data })
+      if (!res.data?.user?.id) return
+      const data = await fetchUser(res.data.user?.id, SupabaseQueries)
+      setUser({
+        ...res.data.user,
+        ...data,
+        avatar: data?.avatar ? imageUpdater(data?.avatar) : data?.avatar,
+      })
     })
   }, [])
 
-  const toggleTheme = async () => {
+  useEffect(() => {
+    user?.id && UpdateUserStatus(user?.id, 'ONLINE', SupabaseQueries)
+  }, [user?.id])
+
+  useEffect(() => {
+    const Update = async () => {
+      if (!user?.id) return
+      UpdateUserLastOnline(user?.id, supabaseClient, 'OFFLINE')
+      console.log('w')
+    }
+
+    window.addEventListener('beforeunload', Update)
+
+    return () => {
+      window.removeEventListener('beforeunload', Update)
+    }
+  }, [user?.id])
+
+  const toggleTheme = async (local?: boolean) => {
     setThemeType((prev) => (prev === 'light' ? 'dark' : 'light'))
-    if (user?.id) {
+    if (user?.id && !local) {
       changeTheme(user?.id, themeType, SupabaseQueries)
     }
   }
@@ -127,7 +174,7 @@ const UserProvider = ({ children }: Props) => {
   useEffect(() => {
     if (user?.id) {
       fetchSettings(user.id, SupabaseQueries).then((data) => {
-        setThemeType(data?.user_settings.theme)
+        setThemeType(data?.user_settings?.theme || 'light')
       })
     }
   }, [user])

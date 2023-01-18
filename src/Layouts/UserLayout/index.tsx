@@ -1,46 +1,31 @@
-import { ChannelType, ChannelsType } from '@/types/channels'
+import { ChannelsType, ChannelType } from '@/types/channels'
 import { Container, UserMessages, Wrap } from './UserLayout.styles'
-import { SupabaseClient, User } from '@supabase/supabase-js'
-import { addChannel, deleteChannel } from '@/services/channels'
+import { User } from '@supabase/supabase-js'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import Navbar from '@/components/SingleUseComponents/Navbar'
-import TrashIcon from '@/assets/icons/TrashIcon'
-import { UserContext } from '@/context/UserContext'
-import { useContext } from 'react'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { userRolesType } from '@/types/user_roles'
+import { useMemo } from 'react'
 import Sidebar from '@/components/SingleUseComponents/Sidebar'
 import { getUserFromChannel } from '@/helpers/getOtherUser'
-import { UserType } from '@/types/users'
 import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { UserType } from '@/types/users'
 
 interface Props {
-  channels: ChannelsType
-  activeChannelId: string
+  channels: Map<number, ChannelType>
+  activeChannel?: ChannelType | null
   children: JSX.Element[] | JSX.Element
-  user?: User | null
-  time?: string
+  otherUser?: UserType | null
+  channelIds: number[]
 }
 
 const UserLayout: React.FC<Props> = ({
   channels,
-  activeChannelId,
   children,
-  user,
-  time,
+  activeChannel,
+  channelIds,
+  otherUser,
 }) => {
-  const slugify = (text: string) => {
-    return text
-      .toString()
-      .toLowerCase()
-      .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(/[^\w-]+/g, '') // Remove all non-word chars
-      .replace(/--+/g, '-') // Replace multiple - with single -
-      .replace(/^-+/, '') // Trim - from start of text
-      .replace(/-+$/, '') // Trim - from end of text
-  }
+  const router = useRouter()
 
   const lastOnline = (date?: string) => {
     if (!date) return undefined
@@ -55,25 +40,27 @@ const UserLayout: React.FC<Props> = ({
       ? `${lastOnlineMinutes} ${lastOnlineMinutes > 1 ? 'minutes' : 'minute'}`
       : lastOnlineHours < 23
       ? `${lastOnlineHours} ${lastOnlineHours > 1 ? 'hours' : 'hour'}`
-      : lastOnlineDays < 3
+      : lastOnlineDays < 7
       ? `${lastOnlineDays} ${lastOnlineDays > 1 ? 'days' : 'day'}`
       : `long time`
   }
-
-  const otherUser =
-    user && getUserFromChannel(user, channels[Number(activeChannelId) - 1])
 
   return (
     <Container>
       <Navbar
         username={otherUser?.username}
-        time={lastOnline(otherUser?.last_online)}
+        time={
+          otherUser?.status === 'ONLINE'
+            ? otherUser?.status
+            : lastOnline(otherUser?.last_online)
+        }
       />
       <Wrap>
-        {/* Sidebar */}
-        {channels && activeChannelId && (
-          <Sidebar activeChannelId={activeChannelId} channels={channels} />
-        )}
+        <Sidebar
+          activeChannelId={`${activeChannel?.id}`}
+          channels={channels}
+          channelIds={channelIds}
+        />
         <UserMessages>{children}</UserMessages>
       </Wrap>
     </Container>

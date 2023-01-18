@@ -1,34 +1,120 @@
 import { UserContext } from '@/context/UserContext'
+import { debounce } from '@/helpers/debounce'
+import { addChannel, fetchChannel, fetchChannels } from '@/services/channels'
 import { ChannelsType, ChannelType } from '@/types/channels'
+import { UserType } from '@/types/users'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { User } from '@supabase/supabase-js'
-import React, { useContext } from 'react'
-import { Container, List } from './Sidebar.styles'
+import Router, { useRouter } from 'next/router'
+import React, { useContext, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Container, List, SearchTitle, StyledInput } from './Sidebar.styles'
 import SidebarItem from './SidebarItem'
 
 interface Props {
-  channels: ChannelsType
+  channels: Map<number, ChannelType>
   activeChannelId: string
+  channelIds: number[]
 }
 
-const Sidebar = ({ channels, activeChannelId }: Props) => {
+const Sidebar = ({ channels, activeChannelId, channelIds }: Props) => {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useForm()
   const { user } = useContext(UserContext)
+  const router = useRouter()
   const supabaseClient = useSupabaseClient()
+
+  const [users, setUsers] = useState<UserType[]>([])
+
+  const searchUsers = async (text: string) => {
+    console.log(text)
+    const { data } = await supabaseClient
+      .from('users')
+      .select('*')
+      .textSearch('username', `${text}`, {
+        type: 'websearch',
+        config: 'english',
+      })
+    data && data?.length > 0 ? setUsers(data) : setUsers([])
+  }
+
+  const debouncedSearchUsers = debounce(
+    (value: string) => searchUsers(value),
+    1000
+  )
+
+  const handleItemClick = async (otherUserId: string) => {
+    if (!user?.id) return
+    const addedChannel = await addChannel(
+      otherUserId,
+      user.id,
+      supabaseClient
+    ).catch((err) => console.error(err, 'w'))
+    if (addedChannel?.error?.code === '42501') {
+      const alreadyAddedChannel = await fetchChannel(
+        user?.id,
+        otherUserId,
+        supabaseClient
+      )
+
+      router.push(`/channels/${alreadyAddedChannel?.id}`)
+    }
+    addedChannel?.data?.id && router.push(`channels/${addedChannel.data?.id}`)
+  }
 
   return (
     <Container>
       <nav>
         <div>
           <List>
-            {channels.map((channel: ChannelType) => (
-              <SidebarItem
-                channel={channel}
-                key={channel.id}
-                isActiveChannel={`${channel.id}` === activeChannelId}
-                user={user}
-                supabaseClient={supabaseClient}
-              />
-            ))}
+            <StyledInput
+              control={control}
+              {...register('search')}
+              errors={errors}
+              onChange={(e) =>
+                debouncedSearchUsers((e.target as HTMLInputElement).value)
+              }
+              inputProps={{ placeholder: 'Search' }}
+            />
+            {users.length > 0 && (
+              <>
+                <hr />
+                <SearchTitle>Global Search Results</SearchTitle>
+                <hr />
+              </>
+            )}
+            {users.length > 0
+              ? users.map((user: UserType) => (
+                  <SidebarItem
+                    handleItemClick={handleItemClick}
+                    channel={{
+                      to_user: user,
+                      created_by: user,
+                      id: 0,
+                      inserted_at: '',
+                    }}
+                    key={user.id}
+                    isActiveChannel={false}
+                    user={user}
+                    supabaseClient={supabaseClient}
+                  />
+                ))
+              : channelIds?.map((id: number) => {
+                  const channel = channels.get(id)
+                  return (
+                    channel && (
+                      <SidebarItem
+                        channel={channel}
+                        key={channel.id}
+                        isActiveChannel={`${channel.id}` === activeChannelId}
+                        user={user}
+                        supabaseClient={supabaseClient}
+                      />
+                    )
+                  )
+                })}
           </List>
         </div>
       </nav>
