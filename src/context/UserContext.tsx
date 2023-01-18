@@ -121,6 +121,15 @@ const UserProvider = ({ children }: Props) => {
     confirmPassword,
     username
   ) => {
+    console.log({
+      email,
+      password,
+      options: {
+        data: {
+          username: username,
+        },
+      },
+    })
     if (confirmPassword) {
       if (confirmPassword !== password)
         return {

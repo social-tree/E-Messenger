@@ -92,7 +92,6 @@ export const UpdateUserStatus = async (
       .from('users')
       .update({ status: status })
       .eq('id', userId)
-    console.log(data)
     return data
   } catch (error) {
     console.log('error', error)
