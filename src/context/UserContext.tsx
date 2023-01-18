@@ -26,7 +26,7 @@ type UserContextType = {
   handleAuth: handleAuthType
   snackbarMessage: string
   setSnackbarMessage: (message: string) => void
-  toggleTheme: () => void
+  toggleTheme: (local?: boolean) => void
 }
 
 export const UserContext = createContext<UserContextType>({
@@ -62,7 +62,8 @@ const UserProvider = ({ children }: Props) => {
       data: { subscription: authListener },
     } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') router.push('/forgot-password')
-      if (event === 'SIGNED_IN') router.push('/channels')
+      if (event === 'SIGNED_IN' && router.route === '/')
+        router.push('/channels')
       if (!session) return
       const data = await fetchUser(session.user?.id, SupabaseQueries)
       setUser({
@@ -107,9 +108,9 @@ const UserProvider = ({ children }: Props) => {
     }
   }, [user?.id])
 
-  const toggleTheme = async () => {
+  const toggleTheme = async (local?: boolean) => {
     setThemeType((prev) => (prev === 'light' ? 'dark' : 'light'))
-    if (user?.id) {
+    if (user?.id && !local) {
       changeTheme(user?.id, themeType, SupabaseQueries)
     }
   }

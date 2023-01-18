@@ -13,6 +13,7 @@ import { channel } from 'diagnostics_channel'
 import dayjs from 'dayjs'
 import { UpdateUserLastOnline } from '@/services/users'
 import { Loading } from '@/components/Elements/Loading'
+import { MessageType } from '@/types/messeges'
 
 const ChannelsPage = () => {
   const router = useRouter()
@@ -22,7 +23,15 @@ const ChannelsPage = () => {
 
   // Else load up the page
   const { id: channelId } = router.query
-  const { messages, channels, loading } = useStore({ channelId })
+  const {
+    messages,
+    channels,
+    loading,
+    users,
+    activeChannel,
+    channelIds,
+    otherUser,
+  } = useStore(channelId ? { channelId: Number(channelId) } : { channelId: 0 })
 
   useEffect(() => {
     messagesEndRef?.current?.scrollIntoView({
@@ -37,7 +46,6 @@ const ChannelsPage = () => {
       router.push('/channels/1')
     }
   }, [channels, channelId]) */
-
   if (loading) {
     return <Loading />
   }
@@ -45,27 +53,32 @@ const ChannelsPage = () => {
   // Render the channels and messages
   return (
     <UserLayout
-      user={user}
+      otherUser={otherUser}
       channels={channels}
-      activeChannelId={channelId as string}
+      channelIds={channelIds}
+      activeChannel={activeChannel}
     >
       <Container>
         <Messages>
           {messages?.map((x, index) => {
             const orderType =
-              messages[index - 1]?.author?.id !== x.author.id &&
-              messages[index + 1]?.author?.id !== x.author.id
+              messages[index - 1]?.author?.id !== x.author?.id &&
+              messages[index + 1]?.author?.id !== x.author?.id
                 ? 'first'
-                : messages[index - 1]?.author?.id !== x.author.id
+                : messages[index - 1]?.author?.id !== x.author?.id
                 ? 'start'
-                : messages[index + 1]?.author?.id === x.author.id
+                : messages[index + 1]?.author?.id === x.author?.id
                 ? 'middle'
-                : messages[index - 1]?.author?.id === x.author.id &&
-                  messages[index + 1]?.author?.id !== x.author.id
+                : messages[index - 1]?.author?.id === x.author?.id &&
+                  messages[index + 1]?.author?.id !== x.author?.id
                 ? 'end'
                 : 'other'
             return (
-              <Message orderType={orderType} key={`${x?.id}`} message={x} />
+              <Message
+                orderType={orderType}
+                key={`${x?.id}`}
+                message={x as MessageType}
+              />
             )
           })}
           <div ref={messagesEndRef} style={{ height: 0 }} />

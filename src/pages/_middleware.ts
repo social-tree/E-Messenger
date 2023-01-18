@@ -2,18 +2,12 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
-const AuthUrls = [
-  '/channels',
-  '/forgot-password',
-  '/channels/[id]',
-  '/channels',
-]
+const AuthUrls = ['/channels', '/channels/[id]', '/channels']
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareSupabaseClient({ req, res })
   const { data } = await supabase.auth.getUser()
-
   if (!data.user && req?.page.name && AuthUrls.includes(req?.page.name)) {
     const redirectUrl = req.nextUrl.clone()
     redirectUrl.pathname = '/'

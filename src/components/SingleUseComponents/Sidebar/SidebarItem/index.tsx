@@ -32,57 +32,14 @@ const SidebarItem = ({
   user,
   handleItemClick,
 }: Props) => {
-  const supabaseClient = useSupabaseClient()
-  const [userChanged, setUserChanged] = useState(false)
-  const [otherUser, setOtherUser] = useState<UserType>(
+  const otherUser =
     channel?.to_user.id === user?.id ? channel?.created_by : channel?.to_user
-  )
-  const [lastMessage, setLastMessage] = useState(channel?.messages?.[0])
+
+  const [lastMessage, setLastMessage] = useState<MessageType>()
 
   useEffect(() => {
-    if (!channel?.to_user.id || !user?.id || !isActiveChannel) return
-    const userListener = supabaseClient
-      .channel('public:users')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'users',
-          filter: `id=eq.${
-            channel?.to_user.id === user?.id
-              ? channel?.created_by.id
-              : channel?.to_user.id
-          }`,
-        },
-        (payload) => {
-          setOtherUser(payload.new as UserType)
-          setUserChanged((prev) => (prev ? false : true))
-        }
-      )
-      .subscribe()
-
-    const messageListener = supabaseClient
-      .channel('public:messagesss')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `channel_id=eq.${channel?.id}`,
-        },
-        (payload) => {
-          setLastMessage(payload.new as MessageType)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabaseClient.removeChannel(userListener)
-      supabaseClient.removeChannel(messageListener)
-    }
-  }, [channel, user])
+    setLastMessage(channel?.messages?.[0])
+  }, [channel])
 
   return (
     <StyledLink

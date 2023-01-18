@@ -1,4 +1,4 @@
-import { ChannelsType } from '@/types/channels'
+import { ChannelsType, ChannelType } from '@/types/channels'
 import { Container, UserMessages, Wrap } from './UserLayout.styles'
 import { User } from '@supabase/supabase-js'
 
@@ -8,20 +8,22 @@ import Sidebar from '@/components/SingleUseComponents/Sidebar'
 import { getUserFromChannel } from '@/helpers/getOtherUser'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
+import { UserType } from '@/types/users'
 
 interface Props {
-  channels: ChannelsType
-  activeChannelId: string
+  channels: Map<number, ChannelType>
+  activeChannel?: ChannelType | null
   children: JSX.Element[] | JSX.Element
-  user?: User | null
-  time?: string
+  otherUser?: UserType | null
+  channelIds: number[]
 }
 
 const UserLayout: React.FC<Props> = ({
   channels,
-  activeChannelId,
   children,
-  user,
+  activeChannel,
+  channelIds,
+  otherUser,
 }) => {
   const router = useRouter()
 
@@ -38,23 +40,10 @@ const UserLayout: React.FC<Props> = ({
       ? `${lastOnlineMinutes} ${lastOnlineMinutes > 1 ? 'minutes' : 'minute'}`
       : lastOnlineHours < 23
       ? `${lastOnlineHours} ${lastOnlineHours > 1 ? 'hours' : 'hour'}`
-      : lastOnlineDays < 3
+      : lastOnlineDays < 7
       ? `${lastOnlineDays} ${lastOnlineDays > 1 ? 'days' : 'day'}`
       : `long time`
   }
-
-  const otherUser = useMemo(() => {
-    if (!user || !activeChannelId || channels.length === 0) return
-    let map = new Map()
-    for (let i = 0; i < channels.length; i++) {
-      map.set(channels[i].id, channels[i])
-    }
-    const result = map.get(Number(activeChannelId))
-    if (!result) {
-      router.push('/channels/')
-    }
-    return result && getUserFromChannel(user, result)
-  }, [user, channels])
 
   return (
     <Container>
@@ -67,7 +56,11 @@ const UserLayout: React.FC<Props> = ({
         }
       />
       <Wrap>
-        <Sidebar activeChannelId={activeChannelId} channels={channels} />
+        <Sidebar
+          activeChannelId={`${activeChannel?.id}`}
+          channels={channels}
+          channelIds={channelIds}
+        />
         <UserMessages>{children}</UserMessages>
       </Wrap>
     </Container>

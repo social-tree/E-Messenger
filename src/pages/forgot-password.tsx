@@ -14,6 +14,8 @@ import { Typography } from '@mui/material'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
+import { useContext, useEffect } from 'react'
+import { UserContext } from '@/context/UserContext'
 
 const ForgotPassword = () => {
   const {
@@ -25,6 +27,8 @@ const ForgotPassword = () => {
   const supabaseClient = createBrowserSupabaseClient()
 
   const router = useRouter()
+
+  const { themeType, toggleTheme } = useContext(UserContext)
 
   const handleAuth = async (data: any) => {
     const { password, confirmPassword } = data
@@ -39,12 +43,32 @@ const ForgotPassword = () => {
     } catch (error: any) {}
   }
 
+  useEffect(() => {
+    if (window && window?.location.hash) {
+      const hashes = window.location.hash.split('&')
+      const authType = hashes[hashes.length - 1]?.split('=')?.[1]
+      authType !== 'recovery' && router.push('/')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (themeType !== 'light') {
+      toggleTheme(true)
+    }
+  }, [themeType])
+
   return (
     <Container>
       <Wrap onSubmit={handleSubmit(handleAuth)}>
         <Typography
           variant="h1"
-          sx={{ fontSize: 30, textAlign: 'center', pb: 2, fontWeight: 900 }}
+          sx={{
+            fontSize: 30,
+            fontFamily: 'Plus Jakarta Sans',
+            textAlign: 'center',
+            pb: 2,
+            fontWeight: 900,
+          }}
         >
           Reset Password
         </Typography>

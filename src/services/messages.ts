@@ -8,7 +8,7 @@ import { SupabaseClient, useSessionContext } from '@supabase/auth-helpers-react'
  */
 
 export const fetchMessages = async (
-  channelId: string,
+  channelId: number,
   setState: Function,
   supabaseClient: SupabaseClient
 ) => {

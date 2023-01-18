@@ -72,9 +72,7 @@ const Navbar = ({ username, time }: Props) => {
     if (user?.avatar) {
       setProfileImage(user.avatar)
     }
-  }, [user?.avatar])
-
-  console.log(profileImage)
+  }, [user?.avatar, time])
 
   return (
     <Container openSettings={!!openSettings}>

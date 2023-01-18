@@ -1,5 +1,5 @@
 import { Modal, Typography } from '@mui/material'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import Button from '@/components/Elements/Button'
 import ChatAnimation from '@/assets/animations/chat.json'
@@ -25,11 +25,17 @@ const Home = () => {
     handleSubmit,
   } = useForm()
   const [showForgetPassword, setShowForgetPassword] = useState(false)
-  const { handleAuth } = useContext(UserContext)
+  const { handleAuth, themeType, toggleTheme } = useContext(UserContext)
 
   const handleClose = () => {
     setShowForgetPassword(false)
   }
+
+  useEffect(() => {
+    if (themeType !== 'light') {
+      toggleTheme(true)
+    }
+  }, [themeType])
 
   const AuthSumbit = async (data: any) => {
     const { email, password, confirmPassword, username } = data

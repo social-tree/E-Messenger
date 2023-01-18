@@ -20,7 +20,9 @@ const ChannelsPage = () => {
 
   // Else load up the page
   const { id: channelId } = router.query
-  const { channels } = useStore({ channelId })
+  const { channels, channelIds } = useStore(
+    channelId ? { channelId: Number(channelId) } : { channelId: 0 }
+  )
 
   // redirect to public channel when current channel is deleted
   /* useEffect(() => {
@@ -43,11 +45,7 @@ const ChannelsPage = () => {
   }, [user])
 
   return (
-    <UserLayout
-      user={user}
-      channels={channels}
-      activeChannelId={channelId as string}
-    >
+    <UserLayout channelIds={channelIds} channels={channels}>
       <Container>Please select a contact to message</Container>
     </UserLayout>
   )
