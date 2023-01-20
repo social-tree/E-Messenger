@@ -6,13 +6,33 @@ export const DateOfCreation = styled.p<{ myMessage: boolean }>`
   color: ${({ theme }) => theme.darkGrey};
 `
 
-export const MessageText = styled.p<{ myMessage: boolean }>`
+export const MessageText = styled.p<{ myMessage: boolean; orderType: string }>`
   padding: 16px;
   max-width: 400px;
+  white-space: pre-wrap;
+  word-break: break-all;
   background-color: ${({ theme, myMessage }) =>
     myMessage ? `${theme.blue}50` : `${theme.grey}80`};
-  border-radius: ${({ myMessage }) =>
-    myMessage ? `16px 16px 0px 16px` : `16px 16px 16px 0px`};
+  border-radius: ${({ myMessage, orderType }) =>
+    orderType === 'start' && !myMessage
+      ? `25px 16px 16px 9px`
+      : orderType === 'start' && myMessage
+      ? `16px 25px 9px 16px`
+      : orderType !== 'end' && !myMessage
+      ? `9px 16px 16px 9px`
+      : orderType !== 'end' && myMessage
+      ? `16px 9px 9px 16px`
+      : orderType === 'end' && !myMessage
+      ? `9px 16px 16px 0px`
+      : `16px 9px 0px 16px`};
+
+  @media only screen and (max-width: 500px) {
+    max-width: 300px;
+  }
+
+  @media only screen and (max-width: 360px) {
+    max-width: 200px;
+  }
 `
 
 export const Username = styled.p`
@@ -31,6 +51,15 @@ export const ProfileImage = styled.div`
   width: 40px;
   height: 40px;
   overflow: hidden;
+  @media only screen and (max-width: 975px) {
+    width: 35px;
+    height: 35px;
+  }
+
+  @media only screen and (max-width: 400px) {
+    width: 23px;
+    height: 23px;
+  }
 `
 
 export const Container = styled.div<{
@@ -48,4 +77,26 @@ export const Container = styled.div<{
   flex-direction: ${({ myMessage }) => (myMessage ? 'row-reverse' : 'row')};
   gap: 20px;
   align-self: ${({ myMessage }) => (myMessage ? 'flex-end' : 'flex-start')};
+
+  @media only screen and (max-width: 975px) {
+    left: ${({ orderType, myMessage }) =>
+      (orderType === 'end' || orderType === 'first') && !myMessage
+        ? ' 0px;'
+        : !myMessage && '45px;'};
+    right: ${({ myMessage }) => myMessage && '45px;'};
+    gap: 10px;
+  }
+
+  @media only screen and (max-width: 570px) {
+    gap: 10px;
+  }
+
+  @media only screen and (max-width: 400px) {
+    left: ${({ orderType, myMessage }) =>
+      (orderType === 'end' || orderType === 'first') && !myMessage
+        ? ' 0px;'
+        : !myMessage && '30px;'};
+    right: ${({ myMessage }) => myMessage && '10px;'};
+    gap: 5px;
+  }
 `

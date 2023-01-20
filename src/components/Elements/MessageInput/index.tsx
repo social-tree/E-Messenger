@@ -39,11 +39,11 @@ const MessageInput = ({ onSubmit }: Props) => {
         errors={errors}
         control={control}
       />
-      <Additional>
+      {/* <Additional>
         <Microphone />
         <Clip />
         <StyledButton type="submit">Send</StyledButton>
-      </Additional>
+      </Additional> */}
     </Container>
   )
 }

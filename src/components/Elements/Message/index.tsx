@@ -32,7 +32,9 @@ const Message = ({ message, orderType }: Props) => {
         {!myMessage && (orderType === 'start' || orderType === 'first') && (
           <Username>{message.author?.username}</Username>
         )}
-        <MessageText myMessage={myMessage}>{message.message}</MessageText>
+        <MessageText orderType={orderType} myMessage={myMessage}>
+          {message.message}
+        </MessageText>
         <DateOfCreation myMessage={myMessage}>
           {FormatDate(message.inserted_at, 'hour')}
         </DateOfCreation>

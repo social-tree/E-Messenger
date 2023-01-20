@@ -1,7 +1,7 @@
 import {
   Container,
   Lastseen,
-  LogoIcon,
+  FullLogoIcon,
   Name,
   ProfileImageContainer,
   ProfileInfo,
@@ -11,8 +11,10 @@ import {
   Upload,
   UserInfo,
   Username,
+  LogoIcon,
+  StyledSidebar,
 } from './Navbar.styles'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 
 import Link from 'next/link'
 import SettingsModal from '../SettingsModal'
@@ -20,19 +22,27 @@ import { UserContext } from '@/context/UserContext'
 import { ImageCropper } from '@/components/Elements/ImageCropper'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { imageUpdater } from '@/helpers/imageUpdater'
+import { useMediaQuery } from '@mui/material'
 
 interface Props {
   username?: string
   time?: number | string
+  toggleSidebar?: () => void
 }
 
-const Navbar = ({ username, time }: Props) => {
+const Navbar = ({ username, time, toggleSidebar }: Props) => {
   const supabaseClient = useSupabaseClient()
   const [openSettings, setOpenSettings] = useState<Element | null>(null)
   const [previewProfile, setPreviewProfile] = useState<string>('')
   const [profileImage, setProfileImage] = useState(
     'https://i.ibb.co/mFg8pLH/c0c216b3743c6cb9fd67ab7df6b2c330.jpg'
   )
+
+  // true if the screen width is less than 975px
+  const isMobile = useMediaQuery('(max-width: 975px)')
+
+  // profile picture input ref
+  const pfpInputRef = useRef(null)
 
   const { user } = useContext(UserContext)
 
@@ -84,8 +94,9 @@ const Navbar = ({ username, time }: Props) => {
   return (
     <Container openSettings={!!openSettings}>
       <Link href={'/'}>
-        <LogoIcon />
+        <FullLogoIcon />
       </Link>
+      <LogoIcon onClick={() => toggleSidebar && toggleSidebar()} />
       {/* show user status/username */}
       <UserInfo>
         {username && <Username>{username}</Username>}
@@ -106,16 +117,24 @@ const Navbar = ({ username, time }: Props) => {
               />
             )}
             <SettingsIcon onClick={(e: any) => handleOpenSettings(e)} />
-            <SettingsModal open={openSettings} onClose={closeSettings} />
+            <SettingsModal
+              pfpInputRef={pfpInputRef}
+              open={openSettings}
+              onClose={closeSettings}
+            />
             <Upload
               onChange={(event) => {
                 handleProfileImage(event?.target?.files?.[0])
                 return (event.currentTarget.value = '')
               }}
+              ref={pfpInputRef}
               id="profileImage"
               type={'file'}
             />
-            <ProfileImageContainer htmlFor="profileImage">
+            <ProfileImageContainer
+              onClick={(e) => isMobile && handleOpenSettings(e)}
+              htmlFor={isMobile ? '' : 'profileImage'}
+            >
               <StyledImage
                 src={`${profileImage}`}
                 width={52}
@@ -126,7 +145,9 @@ const Navbar = ({ username, time }: Props) => {
               />
               <StyledCameraSVG />
             </ProfileImageContainer>
-            <Name>{user.username}</Name>
+            <Name onClick={(e: any) => isMobile && handleOpenSettings(e)}>
+              {user.username}
+            </Name>
           </>
         )}
       </ProfileInfo>
