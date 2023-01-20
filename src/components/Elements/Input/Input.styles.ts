@@ -10,6 +10,7 @@ export const StyledTextField = styled(TextField)`
   min-width: 280px;
   height: 50px;
   .MuiInputBase-root {
+    padding-bottom: 2px;
     color: ${({ theme }) => theme.text};
     min-width: 280px;
     height: 45px;
@@ -26,7 +27,8 @@ export const StyledTextField = styled(TextField)`
   }
 
   .MuiOutlinedInput-notchedOutline {
-    border-color: ${({ theme }) => theme.text};
+    border-color: ${({ theme }) => theme.grey} !important;
+    border-width: 2px;
   }
 `
 
