@@ -23,6 +23,7 @@ const ForgotPassword = () => {
     control,
     formState: { errors },
     handleSubmit,
+    setError,
   } = useForm()
   const supabaseClient = createBrowserSupabaseClient()
 
@@ -30,9 +31,13 @@ const ForgotPassword = () => {
 
   const { themeType, toggleTheme } = useContext(UserContext)
 
-  const handleAuth = async (data: any) => {
+  const handleForgotPassword = async (data: any) => {
     const { password, confirmPassword } = data
-    if (password !== confirmPassword) return
+    if (password !== confirmPassword)
+      return setError('confirmPassword', {
+        type: 'custom',
+        message: `password mismatch`,
+      })
     try {
       const { data, error } = await supabaseClient.auth.updateUser({
         password,
@@ -40,6 +45,12 @@ const ForgotPassword = () => {
       if (data) {
         throw router.push('/')
       }
+
+      error?.message &&
+        setError('confirmPassword', {
+          type: 'custom',
+          message: `${error.message}`,
+        })
     } catch (error: any) {}
   }
 
@@ -59,7 +70,7 @@ const ForgotPassword = () => {
 
   return (
     <Container>
-      <Wrap onSubmit={handleSubmit(handleAuth)}>
+      <Wrap onSubmit={handleSubmit(handleForgotPassword)}>
         <Typography
           variant="h1"
           sx={{

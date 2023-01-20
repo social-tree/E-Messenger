@@ -231,11 +231,12 @@ export const SocialButton = styled(Button)`
   border-radius: 8px;
   width: 100%;
   height: 45px;
+  transition: 500ms all, 0ms border;
   &:hover {
+    border: 2px solid ${({ theme }) => `${theme.grey}60`} !important;
     background-color: transparent;
     border: none;
     box-shadow: none;
-    border: 2px solid ${({ theme }) => `${theme.grey}60`};
   }
 `
 
@@ -278,7 +279,7 @@ export const Inputs = styled.div`
   @media only screen and (max-width: 400px) {
     .MuiFormControl-root,
     .MuiInputBase-root {
-      min-width: 203px;
+      min-width: 203px !important;
     }
   }
 `
@@ -294,8 +295,12 @@ export const Wrap = styled.form`
   @media only screen and (max-width: 900px) {
     max-width: 350px;
     padding: 1.5em 2em;
+    margin: 0.5em;
     min-width: 253px;
     background: ${({ theme }) => theme.bg};
+  }
+  @media only screen and (max-width: 400px) {
+    padding: 1.5em 1.5em;
   }
 `
 

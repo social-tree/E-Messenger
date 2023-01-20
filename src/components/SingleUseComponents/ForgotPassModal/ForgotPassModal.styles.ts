@@ -11,6 +11,12 @@ export const StyledInput = styled(Input)`
   .MuiFormControl-root {
     width: 100%;
   }
+  @media only screen and (max-width: 400px) {
+    .MuiFormControl-root,
+    .MuiInputBase-root {
+      min-width: 203px !important;
+    }
+  }
 `
 
 export const StyledButton = styled(Button)`
@@ -53,4 +59,7 @@ export const StyledModal = styled(Modal)`
   display: flex;
   align-items: center;
   justify-content: center;
+  @media only screen and (max-width: 400px) {
+    margin: 0px 0.5em;
+  }
 `
