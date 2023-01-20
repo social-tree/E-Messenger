@@ -28,10 +28,12 @@ const SettingsModal = ({ open, onClose }: Props) => {
     mode: 'onBlur',
   })
 
+  // toggle the theme on click
   const handleThemeSubmit = () => {
     toggleTheme()
   }
 
+  // change the checkbox staus based on settings
   useEffect(() => {
     reset({ theme: themeType === 'light' ? false : true })
   }, [themeType])

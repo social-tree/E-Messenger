@@ -1,4 +1,10 @@
-import { AuthError, Session, User } from '@supabase/supabase-js'
+import {
+  AuthError,
+  OAuthResponse,
+  Provider,
+  Session,
+  User,
+} from '@supabase/supabase-js'
 
 export type handleAuthType = (
   email: string,

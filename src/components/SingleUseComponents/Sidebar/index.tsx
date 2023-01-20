@@ -28,8 +28,8 @@ const Sidebar = ({ channels, activeChannelId, channelIds }: Props) => {
 
   const [users, setUsers] = useState<UserType[]>([])
 
+  // function to search through users by text
   const searchUsers = async (text: string) => {
-    console.log(text)
     const { data } = await supabaseClient
       .from('users')
       .select('*')
@@ -45,13 +45,11 @@ const Sidebar = ({ channels, activeChannelId, channelIds }: Props) => {
     1000
   )
 
+  // handle the click of the search and create a new channel to that user or redirect to already existing one
   const handleItemClick = async (otherUserId: string) => {
     if (!user?.id) return
-    const addedChannel = await addChannel(
-      otherUserId,
-      user.id,
-      supabaseClient
-    ).catch((err) => console.error(err, 'w'))
+    const addedChannel = await addChannel(otherUserId, user.id, supabaseClient)
+
     if (addedChannel?.error?.code === '42501') {
       const alreadyAddedChannel = await fetchChannel(
         user?.id,
@@ -59,8 +57,10 @@ const Sidebar = ({ channels, activeChannelId, channelIds }: Props) => {
         supabaseClient
       )
 
+      //redirect if channel already exists
       router.push(`/channels/${alreadyAddedChannel?.id}`)
     }
+    // redirect if channel created
     addedChannel?.data?.id && router.push(`channels/${addedChannel.data?.id}`)
   }
 
@@ -85,6 +85,8 @@ const Sidebar = ({ channels, activeChannelId, channelIds }: Props) => {
                 <hr />
               </>
             )}
+
+            {/* show users when searching */}
             {users.length > 0
               ? users.map((user: UserType) => (
                   <SidebarItem

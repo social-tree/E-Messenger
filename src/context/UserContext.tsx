@@ -1,4 +1,4 @@
-import { User } from '@supabase/supabase-js'
+import { OAuthResponse, Provider, User } from '@supabase/supabase-js'
 import { createContext, useEffect, useState } from 'react'
 
 import { handleAuthType } from '@/types/auth'
@@ -18,12 +18,14 @@ import {
   UpdateUserStatus,
 } from '@/services/users'
 import { imageUpdater } from '@/helpers/imageUpdater'
+import { baseUrl } from '@/lib/axiosInstance'
 
 type UserContextType = {
   user?: UserType | null
   themeType: 'light' | 'dark'
   signOut: () => void
   handleAuth: handleAuthType
+  handleOAuth: (provider: Provider) => Promise<OAuthResponse>
   snackbarMessage: string
   setSnackbarMessage: (message: string) => void
   toggleTheme: (local?: boolean) => void
@@ -40,6 +42,13 @@ export const UserContext = createContext<UserContextType>({
     },
     error: null,
   }),
+  handleOAuth: async () => ({
+    data: {
+      provider: 'google',
+      url: '',
+    },
+    error: null,
+  }),
   snackbarMessage: '',
   setSnackbarMessage: () => {},
   toggleTheme: () => {},
@@ -52,11 +61,13 @@ interface Props {
 const UserProvider = ({ children }: Props) => {
   const { supabaseClient } = useSessionContext()
   const SupabaseQueries = useSupabaseClient()
+  // notification message state
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [user, setUser] = useState<UserType | null>(null)
   const [themeType, setThemeType] = useState<'light' | 'dark'>('light')
   const router = useRouter()
 
+  // fetch user Information on their authentication state change
   useEffect(() => {
     const {
       data: { subscription: authListener },
@@ -65,6 +76,7 @@ const UserProvider = ({ children }: Props) => {
       if (event === 'SIGNED_IN' && router.route === '/')
         router.push('/channels')
       if (!session) return
+      // fetch user Information with metadata / settings
       const data = await fetchUser(session.user?.id, SupabaseQueries)
       setUser({
         ...session.user,
@@ -78,6 +90,7 @@ const UserProvider = ({ children }: Props) => {
     }
   }, [])
 
+  // fetch user on page load
   useEffect(() => {
     supabaseClient.auth.getUser().then(async (res) => {
       if (!res.data?.user?.id) return
@@ -90,10 +103,12 @@ const UserProvider = ({ children }: Props) => {
     })
   }, [])
 
+  // update user status to online on page load
   useEffect(() => {
     user?.id && UpdateUserStatus(user?.id, 'ONLINE', SupabaseQueries)
   }, [user?.id])
 
+  // update user status to offline on page unload
   useEffect(() => {
     const Update = async () => {
       if (!user?.id) return
@@ -108,6 +123,7 @@ const UserProvider = ({ children }: Props) => {
     }
   }, [user?.id])
 
+  // change user theme settings
   const toggleTheme = async (local?: boolean) => {
     setThemeType((prev) => (prev === 'light' ? 'dark' : 'light'))
     if (user?.id && !local) {
@@ -115,21 +131,14 @@ const UserProvider = ({ children }: Props) => {
     }
   }
 
+  // function to handle login/signup
   const handleAuth: handleAuthType = async (
     email,
     password,
     confirmPassword,
     username
   ) => {
-    console.log({
-      email,
-      password,
-      options: {
-        data: {
-          username: username,
-        },
-      },
-    })
+    // if confirmPassord is true then the user is trying to signup
     if (confirmPassword) {
       if (confirmPassword !== password)
         return {
@@ -156,12 +165,23 @@ const UserProvider = ({ children }: Props) => {
 
           return response
         })
+
+      // otherwise login
     } else {
       return await supabaseClient.auth.signInWithPassword({
         email,
         password,
       })
     }
+  }
+
+  const handleOAuth = async (provider: Provider) => {
+    return await supabaseClient.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: `${baseUrl}channels`,
+      },
+    })
   }
 
   const signOut = async () => {
@@ -171,6 +191,7 @@ const UserProvider = ({ children }: Props) => {
     }
   }
 
+  // fetch user settings
   useEffect(() => {
     if (user?.id) {
       fetchSettings(user.id, SupabaseQueries).then((data) => {
@@ -184,6 +205,7 @@ const UserProvider = ({ children }: Props) => {
       value={{
         user,
         handleAuth,
+        handleOAuth,
         signOut,
         snackbarMessage,
         setSnackbarMessage,

@@ -5,7 +5,6 @@ import { User } from '@supabase/supabase-js'
 import Navbar from '@/components/SingleUseComponents/Navbar'
 import { useMemo } from 'react'
 import Sidebar from '@/components/SingleUseComponents/Sidebar'
-import { getUserFromChannel } from '@/helpers/getOtherUser'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { UserType } from '@/types/users'
@@ -25,8 +24,6 @@ const UserLayout: React.FC<Props> = ({
   channelIds,
   otherUser,
 }) => {
-  const router = useRouter()
-
   const lastOnline = (date?: string) => {
     if (!date) return undefined
     const lastOnlineSeconds = dayjs().diff(dayjs(date), 'seconds')

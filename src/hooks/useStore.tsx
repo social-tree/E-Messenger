@@ -35,16 +35,19 @@ export const useStore = ({ channelId }: Props) => {
 
   const supabaseClient = useSupabaseClient()
 
-  // Get Channels
-
+  // Get all Channels
   const getChannels = async () => {
     if (user?.id) {
       setLoading(true)
+      // fetch all channels
       await fetchChannels(
         (data: ChannelsType) => {
+          // map with all channels to quickly grab data from
           let map = new Map()
+          // array of the ids of the channels to grab the data with from
           const channelIdsArr = []
 
+          // set all the data
           for (let i = 0; i < data.length; i++) {
             const channel = data[i]
             map.set(channel.id, {
@@ -63,8 +66,12 @@ export const useStore = ({ channelId }: Props) => {
 
           setChannels(map)
           setChannelIds(channelIdsArr)
+
+          // the current active channel
           const activatedChannel = map.get(Number(channelId))
           setActiveChannel(activatedChannel)
+
+          // the current users of the active channel
           setUser(() => {
             const newUsers = new Map()
             newUsers.set(

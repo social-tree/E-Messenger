@@ -35,25 +35,32 @@ const Navbar = ({ username, time }: Props) => {
   )
 
   const { user } = useContext(UserContext)
+
+  // close settings
   const closeSettings = () => {
     setOpenSettings(null)
   }
 
+  // open settings
   const handleOpenSettings = (event: React.MouseEvent<Element>) => {
     setOpenSettings(event.currentTarget)
   }
 
+  // toggle the image cropper component
   const handleProfileImage = (file?: File) => {
     if (!file) return setPreviewProfile('')
 
+    // make the image readable to the cropper
     const reader = new FileReader()
     reader.onloadend = () => {
       if (typeof reader.result !== 'string') return
+      // set the image that will be displayed on the cropper and toggle it on
       setPreviewProfile(reader.result)
     }
     reader.readAsDataURL(file)
   }
 
+  // change profile image to the new edited version in navbar and in database
   const ProfileImageChange = async (uploadedImage: string) => {
     const { data } = supabaseClient.storage
       .from('avatars')
@@ -63,11 +70,11 @@ const Navbar = ({ username, time }: Props) => {
         .from('users')
         .update({ avatar: data.publicUrl })
         .eq('id', user?.id)
-      console.log(data.publicUrl)
       setProfileImage(imageUpdater(data.publicUrl))
     }
   }
 
+  // set navbar profileImage from user
   useEffect(() => {
     if (user?.avatar) {
       setProfileImage(user.avatar)
@@ -79,6 +86,7 @@ const Navbar = ({ username, time }: Props) => {
       <Link href={'/'}>
         <LogoIcon />
       </Link>
+      {/* show user status/username */}
       <UserInfo>
         {username && <Username>{username}</Username>}
         {username && time !== 'ONLINE' ? (
@@ -101,7 +109,6 @@ const Navbar = ({ username, time }: Props) => {
             <SettingsModal open={openSettings} onClose={closeSettings} />
             <Upload
               onChange={(event) => {
-                console.log('W')
                 handleProfileImage(event?.target?.files?.[0])
                 return (event.currentTarget.value = '')
               }}
