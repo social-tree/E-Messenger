@@ -10,13 +10,15 @@ import { useForm } from 'react-hook-form'
 import { UserContext } from '@/context/UserContext'
 import { Switch } from '@/components/Elements/Switch'
 import LogoutSVG from '@/assets/icons/logout.svg'
+import CameraSVG from '@/assets/icons/camera.svg'
 
 interface Props {
   open: Element | null
   onClose: () => void
+  pfpInputRef: React.RefObject<HTMLInputElement>
 }
 
-const SettingsModal = ({ open, onClose }: Props) => {
+const SettingsModal = ({ open, onClose, pfpInputRef }: Props) => {
   const { toggleTheme, themeType, signOut } = useContext(UserContext)
   const {
     control,
@@ -58,6 +60,9 @@ const SettingsModal = ({ open, onClose }: Props) => {
         />
         <StyledButton onClick={() => signOut()}>
           Logout <LogoutSVG width={20} />
+        </StyledButton>
+        <StyledButton onClick={() => pfpInputRef?.current?.click()}>
+          Change Photo <CameraSVG width={20} />
         </StyledButton>
       </Container>
     </StyledPopover>

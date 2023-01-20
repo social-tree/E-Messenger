@@ -16,6 +16,10 @@ export const StyledInput = styled(Input)`
   .MuiOutlinedInput-notchedOutline {
     border: 2px solid ${({ theme }) => theme.grey} !important;
   }
+
+  @media only screen and (max-width: 352px) {
+    max-width: 100%;
+  }
 `
 
 export const List = styled.ul`
@@ -55,5 +59,9 @@ export const Container = styled.div`
     ::-webkit-scrollbar {
       display: block;
     }
+  }
+
+  @media only screen and (max-width: 352px) {
+    min-width: 100%;
   }
 `

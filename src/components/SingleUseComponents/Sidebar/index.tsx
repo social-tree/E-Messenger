@@ -14,9 +14,15 @@ interface Props {
   channels: Map<number, ChannelType>
   activeChannelId: string
   channelIds: number[]
+  className?: string
 }
 
-const Sidebar = ({ channels, activeChannelId, channelIds }: Props) => {
+const Sidebar = ({
+  channels,
+  activeChannelId,
+  channelIds,
+  className,
+}: Props) => {
   const {
     control,
     register,
@@ -65,7 +71,7 @@ const Sidebar = ({ channels, activeChannelId, channelIds }: Props) => {
   }
 
   return (
-    <Container>
+    <Container className={className}>
       <nav>
         <div>
           <List>

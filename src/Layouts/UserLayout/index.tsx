@@ -1,9 +1,15 @@
 import { ChannelsType, ChannelType } from '@/types/channels'
-import { Container, UserMessages, Wrap } from './UserLayout.styles'
+import {
+  Container,
+  ShadowOverlay,
+  StyledSidebar,
+  UserMessages,
+  Wrap,
+} from './UserLayout.styles'
 import { User } from '@supabase/supabase-js'
 
 import Navbar from '@/components/SingleUseComponents/Navbar'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Sidebar from '@/components/SingleUseComponents/Sidebar'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
@@ -24,6 +30,8 @@ const UserLayout: React.FC<Props> = ({
   channelIds,
   otherUser,
 }) => {
+  const [showSidebar, setShowSidebar] = useState(false)
+
   const lastOnline = (date?: string) => {
     if (!date) return undefined
     const lastOnlineSeconds = dayjs().diff(dayjs(date), 'seconds')
@@ -42,8 +50,16 @@ const UserLayout: React.FC<Props> = ({
       : `long time`
   }
 
+  const toggleSidebar = () => {
+    setShowSidebar((prev) => (prev ? false : true))
+  }
+
   return (
     <Container>
+      <ShadowOverlay
+        onClick={() => toggleSidebar()}
+        showSidebar={showSidebar}
+      />
       <Navbar
         username={otherUser?.username}
         time={
@@ -51,12 +67,14 @@ const UserLayout: React.FC<Props> = ({
             ? otherUser?.status
             : lastOnline(otherUser?.last_online)
         }
+        toggleSidebar={toggleSidebar}
       />
       <Wrap>
-        <Sidebar
+        <StyledSidebar
           activeChannelId={`${activeChannel?.id}`}
           channels={channels}
           channelIds={channelIds}
+          showSidebar={showSidebar}
         />
         <UserMessages>{children}</UserMessages>
       </Wrap>

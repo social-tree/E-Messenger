@@ -92,7 +92,7 @@ export const Messages = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   gap: 24px;
-  max-height: calc(100vh - 196px);
+  max-height: calc(100vh - 140px);
   overflow-y: scroll;
   padding-top: 10px;
   ::-webkit-scrollbar {
@@ -106,6 +106,12 @@ const Container = styled.div`
   display: flex;
   height: 100%;
   flex-direction: column;
+  @media only screen and (max-width: 1100px) {
+    padding: 0px 30px 20px 30px;
+  }
+  @media only screen and (max-width: 975px) {
+    padding: 0px 10px 20px 10px;
+  }
 `
 
 export default ChannelsPage
