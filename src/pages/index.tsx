@@ -25,7 +25,8 @@ const Home = () => {
     handleSubmit,
   } = useForm()
   const [showForgetPassword, setShowForgetPassword] = useState(false)
-  const { handleAuth, themeType, toggleTheme } = useContext(UserContext)
+  const { handleAuth, themeType, toggleTheme, handleOAuth } =
+    useContext(UserContext)
 
   const handleClose = () => {
     setShowForgetPassword(false)
@@ -151,7 +152,7 @@ const Home = () => {
           or
         </Typography>
         <SocialButtons>
-          <SocialButton>
+          <SocialButton onClick={() => handleOAuth('google')}>
             <Google />
           </SocialButton>
         </SocialButtons>

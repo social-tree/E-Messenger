@@ -9,6 +9,13 @@ export const SearchTitle = styled.span`
 export const StyledInput = styled(Input)`
   max-width: 276px;
   align-self: center;
+  .MuiInputBase-root {
+    height: 40px;
+    padding-bottom: 2px;
+  }
+  .MuiOutlinedInput-notchedOutline {
+    border: 2px solid ${({ theme }) => theme.grey} !important;
+  }
 `
 
 export const List = styled.ul`

@@ -34,6 +34,7 @@ const ForgotPassModal = ({ onClose, open }: Props) => {
   } = useForm()
   const { supabaseClient } = useSessionContext()
 
+  // send the reset password email
   const handleForgotPass = async (data: any) => {
     const { email } = data
     setEmailSent(true)
