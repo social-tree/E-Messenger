@@ -35,12 +35,14 @@ export type ThemeType = {
   text: string
 }
 
+//including the custom theme type for mui
 declare module '@mui/material/styles/index' {
   interface Theme extends ThemeType {}
   // allow configuration using `createTheme`
   interface ThemeOptions extends ThemeType {}
 }
 
+//including the custom theme type for emotion
 declare module '@emotion/react/types/index' {
   interface Theme extends ThemeType {}
   // allow configuration using `createTheme`

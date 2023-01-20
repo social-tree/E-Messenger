@@ -37,6 +37,7 @@ export const ImageCropper: React.FC<Props> = ({
   })
   const [loading, setLoading] = useState(false)
 
+  // crop image
   const onCropComplete = useCallback(
     (
       croppedArea: any,
@@ -47,6 +48,7 @@ export const ImageCropper: React.FC<Props> = ({
     []
   )
 
+  // upload cropped image to database
   const showCroppedImage = useCallback(async () => {
     if (!croppedAreaPixels) return
     try {

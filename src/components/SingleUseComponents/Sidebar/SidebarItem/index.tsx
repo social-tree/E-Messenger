@@ -1,9 +1,7 @@
 import { FormatDate } from '@/helpers/FormatDate'
-import { imageUpdater } from '@/helpers/imageUpdater'
+import { getOtherUser } from '@/helpers/getOtherUser'
 import { ChannelType } from '@/types/channels'
 import { MessageType } from '@/types/messeges'
-import { UserType } from '@/types/users'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { SupabaseClient, User } from '@supabase/supabase-js'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -32,11 +30,12 @@ const SidebarItem = ({
   user,
   handleItemClick,
 }: Props) => {
-  const otherUser =
-    channel?.to_user.id === user?.id ? channel?.created_by : channel?.to_user
+  // the other user of the channel and not the logged in user
+  const otherUser = user && getOtherUser(user, channel)
 
   const [lastMessage, setLastMessage] = useState<MessageType>()
 
+  // update last message if it has changed
   useEffect(() => {
     setLastMessage(channel?.messages?.[0])
   }, [channel])
@@ -53,7 +52,7 @@ const SidebarItem = ({
         <>
           <ProfileImage>
             <Image
-              src={otherUser?.avatar}
+              src={`${otherUser?.avatar}`}
               width="33"
               height="33"
               alt={'profile image'}
