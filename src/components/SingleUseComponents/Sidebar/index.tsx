@@ -1,14 +1,15 @@
-import { UserContext } from '@/context/UserContext'
-import { debounce } from '@/helpers/debounce'
-import { addChannel, fetchChannel, fetchChannels } from '@/services/channels'
-import { ChannelsType, ChannelType } from '@/types/channels'
-import { UserType } from '@/types/users'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import Router, { useRouter } from 'next/router'
-import React, { useContext, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Container, List, SearchTitle, StyledInput } from './Sidebar.styles'
-import SidebarItem from './SidebarItem'
+import { UserContext } from '@/context/UserContext';
+import { debounce } from '@/helpers/debounce';
+import { addChannel, fetchChannel } from '@/services/channels';
+import { ChannelType } from '@/types/channels';
+import { UserType } from '@/types/users';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import Router, { useRouter } from 'next/router';
+import React, { useContext, useState } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { Container, List, SearchTitle, StyledInput } from './Sidebar.styles';
+import SidebarItem from './SidebarItem';
 
 interface Props {
   channels: Map<number, ChannelType>
@@ -36,13 +37,11 @@ const Sidebar = ({
 
   // function to search through users by text
   const searchUsers = async (text: string) => {
+    if(!text) return setUsers([])
     const { data } = await supabaseClient
       .from('users')
       .select('*')
-      .textSearch('username', `${text}`, {
-        type: 'websearch',
-        config: 'english',
-      })
+      .like('username', `%${text}%`)
     data && data?.length > 0 ? setUsers(data) : setUsers([])
   }
 
