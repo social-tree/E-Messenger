@@ -1,19 +1,17 @@
-import { Modal, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
 
 import Button from '@/components/Elements/Button'
 import ChatAnimation from '@/assets/animations/chat.json'
 import ForgotPassModal from '@/components/SingleUseComponents/ForgotPassModal'
 import Google from '@/assets/icons/Google.svg'
-import Image from 'next/image'
 import { Input } from '@/components/Elements/Input'
-import Layout from '@/Layouts/UserLayout'
 import Lottie from 'lottie-react'
 import { UserContext } from '@/context/UserContext'
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import styled from '@emotion/styled'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/router'
+import LightningIcon from '@/assets/icons/lightning.svg'
+import OtpLoginModal from '@/components/SingleUseComponents/OtpLoginModal'
 
 const Home = () => {
   const [authMode, setAuthMode] = useState('login')
@@ -25,11 +23,16 @@ const Home = () => {
     handleSubmit,
   } = useForm()
   const [showForgetPassword, setShowForgetPassword] = useState(false)
+  const [showOtpPassword, setShowOtpPassword] = useState(false)
   const { handleAuth, themeType, toggleTheme, handleOAuth } =
     useContext(UserContext)
 
-  const handleClose = () => {
+  const handleForgotPasswordClose = () => {
     setShowForgetPassword(false)
+  }
+
+  const handleOtpClose = () => {
+    setShowOtpPassword(false)
   }
 
   useEffect(() => {
@@ -60,7 +63,12 @@ const Home = () => {
 
   return (
     <Container>
-      <ForgotPassModal onClose={handleClose} open={showForgetPassword} />
+      <OtpLoginModal onClose={handleOtpClose} open={showOtpPassword} />
+
+      <ForgotPassModal
+        onClose={handleForgotPasswordClose}
+        open={showForgetPassword}
+      />
       <Wrap onSubmit={handleSubmit(AuthSumbit)}>
         <Inputs>
           {authMode !== 'login' && (
@@ -155,6 +163,10 @@ const Home = () => {
           <SocialButton onClick={() => handleOAuth('google')}>
             <Google />
           </SocialButton>
+          <SocialButton onClick={() => setShowOtpPassword(true)}>
+            <LightningIcon />
+            Quick Login
+          </SocialButton>
         </SocialButtons>
         <Typography
           sx={{
@@ -232,6 +244,8 @@ export const SocialButton = styled(Button)`
   width: 100%;
   height: 45px;
   transition: 500ms all, 0ms border;
+  display: flex;
+  gap: 5px;
   &:hover {
     border: 2px solid ${({ theme }) => `${theme.grey}60`} !important;
     background-color: transparent;
@@ -242,7 +256,8 @@ export const SocialButton = styled(Button)`
 
 export const SocialButtons = styled.div`
   display: flex;
-  gap: 5px;
+  flex-direction: column;
+  gap: 10px;
 `
 
 export const SignIn = styled(Button)`
