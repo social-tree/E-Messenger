@@ -1,19 +1,15 @@
-import { useContext, useEffect, useRef } from 'react'
-
-import UserLayout from '@/Layouts/UserLayout'
-import Message from '@/components/Elements/Message'
-import MessageInput from '@/components/Elements/MessageInput'
-import { UserContext } from '@/context/UserContext'
-import { addMessage } from '@/services/messages'
-import styled from '@emotion/styled'
-import { useRouter } from 'next/router'
-import { useStore } from '@/hooks/useStore'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { channel } from 'diagnostics_channel'
-import dayjs from 'dayjs'
-import { UpdateUserLastOnline } from '@/services/users'
-import { Loading } from '@/components/Elements/Loading'
-import { MessageType } from '@/types/messeges'
+import { Loading } from '@/components/Elements/Loading';
+import Message from '@/components/Elements/Message';
+import MessageInput from '@/components/Elements/MessageInput';
+import { UserContext } from '@/context/UserContext';
+import { useStore } from '@/hooks/useStore';
+import UserLayout from '@/Layouts/UserLayout';
+import { addMessage } from '@/services/messages';
+import { MessageType } from '@/types/messeges';
+import styled from '@emotion/styled';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useRef } from 'react';
 
 const ChannelsPage = () => {
   const router = useRouter()
@@ -34,6 +30,7 @@ const ChannelsPage = () => {
   } = useStore(channelId ? { channelId: Number(channelId) } : { channelId: 0 })
 
   useEffect(() => {
+    console.log(messages)
     messagesEndRef?.current?.scrollIntoView({
       block: 'start',
       behavior: 'smooth',

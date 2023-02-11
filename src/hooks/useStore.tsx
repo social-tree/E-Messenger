@@ -1,15 +1,12 @@
-import { ChannelType, ChannelsType } from '@/types/channels'
-import { MessageType, MessagesType } from '@/types/messeges'
-import { useContext, useEffect, useState } from 'react'
-
-import { User } from '@supabase/supabase-js'
-import { UserContext } from '@/context/UserContext'
-import { fetchChannels } from '@/services/channels'
-import { fetchMessages } from '@/services/messages'
-import { fetchUser } from '@/services/users'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { UserType } from '@/types/users'
-import { imageUpdater } from '@/helpers/imageUpdater'
+import { UserContext } from '@/context/UserContext';
+import { imageUpdater } from '@/helpers/imageUpdater';
+import { fetchChannels } from '@/services/channels';
+import { fetchMessages } from '@/services/messages';
+import { ChannelsType, ChannelType } from '@/types/channels';
+import { MessagesType, MessageType } from '@/types/messeges';
+import { UserType } from '@/types/users';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useContext, useEffect, useState } from 'react';
 
 interface Props {
   channelId: number
@@ -103,6 +100,7 @@ export const useStore = ({ channelId }: Props) => {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload) => {
+          console.log(payload,"payload s")
           const message = payload.new as MessageType
           handleNewMessage(message)
           setChannels((prev) => {
@@ -178,7 +176,11 @@ export const useStore = ({ channelId }: Props) => {
     if (newMessage && newMessage.channel_id === Number(channelId)) {
       const handleAsync = async () => {
         let authorId = newMessage.user_id
-        if (!users.get(authorId)) setMessages(messages.concat(newMessage))
+        if(!users.get(authorId)) return
+        setMessages(prev => {
+          console.log([...prev,newMessage],"new")
+          return [...prev,newMessage]
+        })
       }
       handleAsync()
     }

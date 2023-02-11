@@ -41,7 +41,7 @@ const Sidebar = ({
     const { data } = await supabaseClient
       .from('users')
       .select('*')
-      .like('username', `%${text}%`)
+      .ilike('username', `%${text}%`)
     data && data?.length > 0 ? setUsers(data) : setUsers([])
   }
 
@@ -63,7 +63,7 @@ const Sidebar = ({
       )
 
       //redirect if channel already exists
-      router.push(`/channels/${alreadyAddedChannel?.id}`)
+      alreadyAddedChannel?.id ? router.push(`/channels/${alreadyAddedChannel?.id}`) : router.push(`/channels/`)
     }
     // redirect if channel created
     addedChannel?.data?.id && router.push(`channels/${addedChannel.data?.id}`)
@@ -93,18 +93,18 @@ const Sidebar = ({
 
             {/* show users when searching */}
             {users.length > 0
-              ? users.map((user: UserType) => (
+              ? users.map((userResults: UserType) => user?.id !== userResults.id && (
                   <SidebarItem
                     handleItemClick={handleItemClick}
                     channel={{
-                      to_user: user,
-                      created_by: user,
+                      to_user: userResults,
+                      created_by: userResults,
                       id: 0,
                       inserted_at: '',
                     }}
-                    key={user.id}
+                    key={userResults.id}
                     isActiveChannel={false}
-                    user={user}
+                    user={userResults}
                     supabaseClient={supabaseClient}
                   />
                 ))
