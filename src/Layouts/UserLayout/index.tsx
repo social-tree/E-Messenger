@@ -32,24 +32,6 @@ const UserLayout: React.FC<Props> = ({
 }) => {
   const [showSidebar, setShowSidebar] = useState(false)
 
-  const lastOnline = (date?: string) => {
-    if (!date) return undefined
-    const lastOnlineSeconds = dayjs().diff(dayjs(date), 'seconds')
-    const lastOnlineMinutes = dayjs().diff(dayjs(date), 'minutes')
-    const lastOnlineHours = dayjs().diff(dayjs(date), 'hours')
-    const lastOnlineDays = dayjs().diff(dayjs(date), 'days')
-
-    return lastOnlineSeconds < 60
-      ? `${lastOnlineSeconds} ${lastOnlineSeconds > 1 ? 'seconds' : 'second'}`
-      : lastOnlineMinutes < 60
-      ? `${lastOnlineMinutes} ${lastOnlineMinutes > 1 ? 'minutes' : 'minute'}`
-      : lastOnlineHours < 23
-      ? `${lastOnlineHours} ${lastOnlineHours > 1 ? 'hours' : 'hour'}`
-      : lastOnlineDays < 7
-      ? `${lastOnlineDays} ${lastOnlineDays > 1 ? 'days' : 'day'}`
-      : `long time`
-  }
-
   const toggleSidebar = () => {
     setShowSidebar((prev) => (prev ? false : true))
   }
@@ -62,11 +44,7 @@ const UserLayout: React.FC<Props> = ({
       />
       <Navbar
         username={otherUser?.username}
-        time={
-          otherUser?.status === 'ONLINE'
-            ? otherUser?.status
-            : lastOnline(otherUser?.last_online)
-        }
+        time={''}
         toggleSidebar={toggleSidebar}
       />
       <Wrap>

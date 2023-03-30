@@ -98,14 +98,7 @@ const Navbar = ({ username, time, toggleSidebar }: Props) => {
       </Link>
       <LogoIcon onClick={() => toggleSidebar && toggleSidebar()} />
       {/* show user status/username */}
-      <UserInfo>
-        {username && <Username>{username}</Username>}
-        {username && time !== 'ONLINE' ? (
-          <Lastseen>last seen {time} ago</Lastseen>
-        ) : (
-          username && <Lastseen>is online</Lastseen>
-        )}
-      </UserInfo>
+      <UserInfo>{username && <Username>{username}</Username>}</UserInfo>
       <ProfileInfo>
         {user && (
           <>

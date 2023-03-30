@@ -103,26 +103,6 @@ const UserProvider = ({ children }: Props) => {
     })
   }, [])
 
-  // update user status to online on page load
-  useEffect(() => {
-    user?.id && UpdateUserStatus(user?.id, 'ONLINE', SupabaseQueries)
-  }, [user?.id])
-
-  // update user status to offline on page unload
-  useEffect(() => {
-    const Update = async () => {
-      if (!user?.id) return
-      UpdateUserLastOnline(user?.id, supabaseClient, 'OFFLINE')
-      console.log('w')
-    }
-
-    window.addEventListener('beforeunload', Update)
-
-    return () => {
-      window.removeEventListener('beforeunload', Update)
-    }
-  }, [user?.id])
-
   // change user theme settings
   const toggleTheme = async (local?: boolean) => {
     setThemeType((prev) => (prev === 'light' ? 'dark' : 'light'))
