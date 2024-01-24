@@ -18,6 +18,7 @@ export const fetchMessages = async (
       .select(`*, author:user_id(*)`)
       .eq('channel_id', channelId)
       .order('inserted_at', { ascending: true })
+      .limit(12)
     if (setState) setState(data)
     return data
   } catch (error) {

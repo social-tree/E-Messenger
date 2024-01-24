@@ -1,21 +1,22 @@
-import { Loading } from '@/components/Elements/Loading';
-import Message from '@/components/Elements/Message';
-import MessageInput from '@/components/Elements/MessageInput';
-import { UserContext } from '@/context/UserContext';
-import { useStore } from '@/hooks/useStore';
-import UserLayout from '@/Layouts/UserLayout';
-import { addMessage } from '@/services/messages';
-import { MessageType } from '@/types/messeges';
-import styled from '@emotion/styled';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useRef } from 'react';
+import { Loading } from '@/components/Elements/Loading'
+import Message from '@/components/Elements/Message'
+import MessageInput from '@/components/Elements/MessageInput'
+import { UserContext } from '@/context/UserContext'
+import { useStore } from '@/hooks/useStore'
+import UserLayout from '@/Layouts/UserLayout'
+import { addMessage } from '@/services/messages'
+import { MessageType } from '@/types/messeges'
+import styled from '@emotion/styled'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useRouter } from 'next/router'
+import { useContext, useEffect, useRef } from 'react'
 
 const ChannelsPage = () => {
   const router = useRouter()
   const { user } = useContext(UserContext)
   const messagesEndRef = useRef<null | HTMLDivElement>(null)
   const supabaseClient = useSupabaseClient()
+  const messagesRef = useRef<null | HTMLDivElement>(null)
 
   // Else load up the page
   const { id: channelId } = router.query
@@ -30,12 +31,24 @@ const ChannelsPage = () => {
   } = useStore(channelId ? { channelId: Number(channelId) } : { channelId: 0 })
 
   useEffect(() => {
-    console.log(messages)
     messagesEndRef?.current?.scrollIntoView({
       block: 'start',
       behavior: 'smooth',
     })
   }, [messages])
+
+  const handleFetchNewMesssages = (event: Event) => {
+    console.log((event.target as HTMLDivElement).firstChild?.textContent)
+  }
+
+  useEffect(() => {
+    if (!messagesRef?.current) return
+    messagesRef.current.addEventListener('scroll', handleFetchNewMesssages)
+    return () => {
+      if (!messagesRef?.current) return
+      messagesRef.current.removeEventListener('scroll', handleFetchNewMesssages)
+    }
+  })
 
   if (loading) {
     return <Loading />
@@ -49,7 +62,7 @@ const ChannelsPage = () => {
       activeChannel={activeChannel}
     >
       <Container>
-        <Messages>
+        <Messages ref={messagesRef}>
           {messages?.map((x, index) => {
             const orderType =
               messages[index - 1]?.author?.id !== x.author?.id &&

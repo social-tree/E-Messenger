@@ -160,9 +160,6 @@ const Home = () => {
           or
         </Typography>
         <SocialButtons>
-          <SocialButton onClick={() => handleOAuth('google')}>
-            <Google />
-          </SocialButton>
           <SocialButton onClick={() => setShowOtpPassword(true)}>
             <LightningIcon />
             Quick Login
